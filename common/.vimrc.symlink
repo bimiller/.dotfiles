@@ -1,0 +1,85 @@
+" Use .vim directory on all platforms
+
+if has('win32') || has('win64')
+  set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+endif
+
+" Enable VIM extensions
+
+set nocompatible
+
+" Colors & fonts
+
+if has("gui_running")
+    colorscheme zenburn
+    set guifont=Consolas:h12 " My favorite font
+    set guifontwide=NSimSun
+    syntax on	" enable syntax highlighting
+    set lines=36 columns=150
+    winp 100 30
+endif
+
+" Spaces & tabs
+
+set tabstop=4       " number of visual spaces per TAB
+set shiftwidth=4
+set softtabstop=4   " number of spaces in tab when editing
+set expandtab       " tabs are spaces
+
+" UI config
+
+set number              " show line numbers
+set showmode            " show VIM mode in bottom bar
+set showcmd             " show pending command in bottom bar
+set ruler               " show cursor position in bottom bar
+set cursorline          " highlight current line
+filetype plugin indent on      " load filetype-specific indent files
+set wildmenu            " visual autocomplete for command menu
+set showmatch           " highlight matching [{()}]
+set autoindent
+set smartindent
+set cmdheight=2         " allow 2 lines on bottom for longer error messages
+
+" Searching
+
+set incsearch           " search as characters are entered
+set hlsearch            " highlight matches
+nnoremap <leader><space> :nohlsearch<CR> " turn off search highlight
+set ignorecase
+set smartcase
+set tags=./tags;
+
+" Folding
+
+set foldenable          " enable folding
+set foldlevelstart=10   " open most folds by default
+set foldnestmax=10      " 10 nested fold max
+nnoremap <space> za	" space open/closes folds
+set foldmethod=indent   " fold based on indent level
+
+" Movement
+
+" move vertically by visual line
+"nnoremap j gj
+"nnoremap k gk
+
+nnoremap gV `[v`]	" highlight last inserted text
+
+" Tool integration
+
+"set grepprg=c:\cygwin\bin\grep.exe
+set grepprg=grep
+
+" Backup files
+
+set nowritebackup
+set nobackup
+set noswapfile
+
+set hidden              " switch between buffers w/o saving
+
+" File encoding
+
+set encoding=utf-8
+
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown

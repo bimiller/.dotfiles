@@ -1,0 +1,75 @@
+
+# If not running interactively, don't do anything
+[[ "$-" != *i* ]] && return
+
+# Use case-insensitive filename globbing
+shopt -s nocaseglob
+
+# Interactive operation...
+# alias rm='rm -i'
+# alias cp='cp -i'
+# alias mv='mv -i'
+#
+# Default to human readable figures
+# alias df='df -h'
+# alias du='du -h'
+#
+# Misc :)
+# alias less='less -r'                          # raw control characters
+# alias whence='type -a'                        # where, of a sort
+# alias grep='grep --color'                     # show differences in colour
+# alias egrep='egrep --color=auto'              # show differences in colour
+# alias fgrep='fgrep --color=auto'              # show differences in colour
+#
+# Some shortcuts for different directory listings
+# alias ls='ls -hF --color=tty'                 # classify files in colour
+# alias dir='ls --color=auto --format=vertical'
+# alias vdir='ls --color=auto --format=long'
+# alias ll='ls -l'                              # long list
+# alias la='ls -A'                              # all but . and ..
+# alias l='ls -CF'                              #
+
+# Use color with ls.
+alias ls="ls --color=auto"
+
+# List all files (hidden included)
+alias la="ls -a"
+
+# List all files (hidden included) in long (detailed) format
+alias lal="ls -al"
+
+function doPrompt {
+
+	# define colors
+	local BLACK="\[\033[0;30;47m\]"
+	local RED="\[\033[1;31;47m\]"
+	local GREEN="\[\033[0;32;47m\]"
+	local YELLOW="\[\033[0;33;47m\]"
+	local BLUE="\[\033[1;34;47m\]"
+	local MAGENTA="\[\033[0;35;47m\]"
+	local CYAN="\[\033[0;36;47m\]"
+	local WHITE="\[\033[1;37;47m\]"
+	
+	# define bg colors
+	local BG_BLACK="\[\033[40m\]"
+	local BG_RED="\[\033[41m\]"
+	local BG_GREEN="\[\033[42m\]"
+	local BG_YELLOW="\[\033[43m\]"
+	local BG_BLUE="\[\033[44m\]"
+	local BG_MAGENTA="\[\033[45m\]"
+	local BG_CYAN="\[\033[46m\]"
+	local BG_WHITE="\[\033[48m\]"
+	
+	# define prompt
+	# export PS1="${BLACK}\t${BLACK}# "
+	export PS1="\[\e[1m\]\$ \[\e[22m\]"
+}
+
+doPrompt
+
+eval "`dircolors -b ~/.dir_colors`"
+
+HOST_BASHRC="${HOME}/.bashrc_$(hostname)"
+if [ -f "$HOST_BASHRC" ] ; then
+  source "$HOST_BASHRC"
+fi
