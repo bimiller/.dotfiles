@@ -5,33 +5,38 @@
 # Use case-insensitive filename globbing
 shopt -s nocaseglob
 
-# Alias basic utils to use preferred defaults (also use Homebrew coreutils on Mac)
-if [ $(uname -s) == "Darwin" ]; then
-    alias ls='gls -hF --color=auto'
-    alias dircolors='gdircolors'
-else
-    alias ls='ls -hF --color=auto'
-fi
+# Interactive operation...
+# alias rm='rm -i'
+# alias cp='cp -i'
+# alias mv='mv -i'
+#
+# Default to human readable figures
+# alias df='df -h'
+# alias du='du -h'
+#
+# Misc :)
+# alias less='less -r'                          # raw control characters
+# alias whence='type -a'                        # where, of a sort
+# alias grep='grep --color'                     # show differences in colour
+# alias egrep='egrep --color=auto'              # show differences in colour
+# alias fgrep='fgrep --color=auto'              # show differences in colour
+#
+# Some shortcuts for different directory listings
+# alias ls='ls -hF --color=tty'                 # classify files in colour
+# alias dir='ls --color=auto --format=vertical'
+# alias vdir='ls --color=auto --format=long'
+# alias ll='ls -l'                              # long list
+# alias la='ls -A'                              # all but . and ..
+# alias l='ls -CF'                              #
 
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
+# Use color with ls.
+alias ls="ls --color=auto"
 
-alias df='df -h'
-alias du='du -h'
+# List all files (hidden included)
+alias la="ls -a"
 
-alias grep='grep --color'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
-
-# Shortcuts for popular options & commands
-
-alias ll='ls -l'
-alias la='ls -A'
-alias lal="ls -Al"
-
-alias e=emacs
-alias ec=emacsclient
+# List all files (hidden included) in long (detailed) format
+alias lal="ls -al"
 
 function doPrompt {
 

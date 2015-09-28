@@ -380,8 +380,8 @@ point reaches the beginning or end of the buffer, stop there."
       ((string-equal system-type "gnu/linux")
        )
       ((string-equal system-type "darwin")
-       ;; (require 'exec-path-from-shell) ;; if not using the ELPA package
-       ;; (exec-path-from-shell-initialize)
+       (require 'exec-path-from-shell) ;; if not using the ELPA package
+       (exec-path-from-shell-initialize)
        )
        ;; Use homebrew ASpell instead of ISpell (brew install aspell --lang=en)
        (setq-default ispell-program-name "aspell")
