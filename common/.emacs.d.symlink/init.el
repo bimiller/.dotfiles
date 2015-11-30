@@ -154,7 +154,7 @@
     ("Inconsolata" . ,(if (eq system-type 'darwin) 140 110))
     ("Monaco" . 140)
     ("Consolas" . 120)
-    ("DejaVu Sans Mono" . 110)
+    ("DejaVu Sans Mono" . 130)
     ("Courier New" . 130))
   "My preferred monospace fonts.
 The `car' of each item is the font family, the `cdr' the preferred font size.")
@@ -207,7 +207,7 @@ VAR-VAL should be a (VAR VAL) pair."
 ;; Use UTF-8 by default for new files, file detection, etc.
 (prefer-coding-system 'utf-8)
 
-;; I map this to the Cygwin tmp directory on MS Windows.
+;; I map this to the system tmp directory.
 (setq temporary-file-directory "/tmp/")
 
 ;; Keep backup and auto save files out of the way.
