@@ -13,3 +13,9 @@ HOST_PROFILE="${HOME}/.bash_profile_$(hostname)"
 if [ -f "$HOST_PROFILE" ] ; then
   source "$HOST_PROFILE"
 fi
+
+export ALTERNATE_EDITOR=emacs
+export EDITOR=emacsclient
+
+# added by Anaconda2 2.4.0 installer
+export PATH="/Users/bill/anaconda/bin:$PATH"
