@@ -2,17 +2,37 @@
 ;; Emacs customizations
 ;;============================================================================
 
-(setq inhibit-default-init t) ;; Disable the default site settings.
+(setq inhibit-default-init t) ;; Disable the local default settings.
 
-;; Use Command as Meta on Macs. (set early in case init.el needs editing)
+;;----------------------------------------------------------------------------
+;; Basic keyboard remappings
+;;----------------------------------------------------------------------------
+
+;; Use Command as Meta on Macs.
 (when (equal window-system 'ns)
   (setq  mac-option-modifier 'super ; use Option as Command key
          mac-command-modifier 'meta ; use Command as Meta
          mac-command-key-is-meta t
          mac-right-command-modifier 'left ; right and left Command are the same
-         mac-right-option-modifier 'none ; Keep right Option for accented input
+         mac-right-option-modifier 'left ; right and left Opt are the same
          mac-function-modifier 'hyper)
   (global-set-key (kbd "M-`") 'other-frame))
+
+;; Shell-compatible line-editing key bindings
+(define-key key-translation-map [?\C-h] [?\C-?]) ;; remap Ctrl-H to Del
+;;(global-set-key "\C-w" 'backward-kill-word)
+
+;; Highlight region when mark is active.
+(transient-mark-mode 1)
+
+;; Single-char deletion kills active region (instead of deleting it)
+;;(setq delete-active-region 'kill)
+
+;; Delete the selection when inserting.
+(delete-selection-mode 1)
+
+;; Don't operate on regions unless the mark is active.
+(setq mark-even-if-inactive nil)
 
 
 ;;----------------------------------------------------------------------------
@@ -42,7 +62,7 @@
   '(
     ;; ack-and-a-half ;; Code search
     ;; auto-complete
-    ;; exec-path-from-shell ;; Set PATH from shell
+    exec-path-from-shell ;; Set PATH from shell
     ;; expand-region ;; Expand region by semantic units
     ;; git-commit-mode ;; Git commit message mode
     ;; gitconfig-mode ;; Git configuration mode
@@ -71,12 +91,11 @@
 
 
 ;;----------------------------------------------------------------------------
-;; User interface
+;; User interface preferences
 ;;----------------------------------------------------------------------------
 
-;; Get rid of tool bar, menu bar and scroll bars. On OS X we preserve the menu
-;; bar, since the top menu bar is always visible anyway, and we'd just empty it
-;; which is rather pointless.
+;; Get rid of tool bar, menu bar and scroll bars. (On OS X preserve the menu
+;; bar, since the top menu bar is always visible anyway.)
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (and (not (eq window-system "ns")) (fboundp 'menu-bar-mode) (not (display-graphic-p)))
@@ -84,14 +103,10 @@
 (when (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
-;; Highlight region when active
-(transient-mark-mode)
+;; Limit cursor blinking.
+(setq blink-cursor-blinks 3)
 
-;; Delete the selection instead of inserting
-(delete-selection-mode)
-
-;; No blinking and beeping, no startup screen, and no scratch message.
-(blink-cursor-mode -1)
+;; No beeping, no startup screen, and no scratch message.
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
       initial-scratch-message nil
@@ -106,7 +121,7 @@
 (setq-default sentence-end-double-space nil)
 
 ;; Show cursor position and file size on mode line.
-(line-number-mode -1)
+(line-number-mode)
 (column-number-mode)
 (size-indication-mode)
 
@@ -119,25 +134,25 @@
 ;; Sync cut/copied text with the MS Windows clipboard.
 (setq x-select-enable-clipboard t)
 
-;; Move between windows with Shift + Arrow keys
-(windmove-default-keybindings)
+;; Mouse yank commands yank at point instead of at click.
+(setq mouse-yank-at-point t)
 
 
 ;;----------------------------------------------------------------------------
 ;; Fonts and color themes
 ;;----------------------------------------------------------------------------
 
-;; Choose Font and color theme. We prefer Source Code Pro, and then Anonymous
+;; Choose Font and color theme. Prefer Source Code Pro, and then Anonymous
 ;; Pro from http://www.marksimonson.com/fonts/view/anonymous-pro or Inconsolata
-;; (from the Google Webfont directory). On OS X, we need to give these fonts a
-;; larger size. If neither is available, we fall back to the standard faces of
-;; OS X (Menlo), Linux (DejaVu Sans Mono) or Windows (Consolas, Courier New)
+;; (from the Google Webfont directory). On OS X, give these fonts a larger size.
+;; If neither is available, fall back to the standard faces of OS X (Monaco),
+;; Linux (DejaVu Sans Mono) or Windows (Consolas, Courier New).
 (defconst my:preferred-monospace-fonts
   `(("Source Code Pro" . ,(if (eq system-type 'darwin) 130 100))
     ("Anonymous Pro" . ,(if (eq system-type 'darwin) 140 110))
     ("Anonymous Pro Minus" . ,(if (eq system-type 'darwin) 140 110))
     ("Inconsolata" . ,(if (eq system-type 'darwin) 140 110))
-    ("Menlo" . 130)
+    ("Monaco" . 140)
     ("Consolas" . 120)
     ("DejaVu Sans Mono" . 130)
     ("Courier New" . 130))
@@ -181,11 +196,12 @@ VAR-VAL should be a (VAR VAL) pair."
                                 :family (car font) :height (cdr font))))
 (my:choose-best-fonts)
 
+;; Set preferred color scheme.
 (load-theme 'zenburn 'no-confirm)
 
 
 ;;----------------------------------------------------------------------------
-;; File handling
+;; File handling prefernces
 ;;----------------------------------------------------------------------------
 
 ;; Use UTF-8 by default for new files, file detection, etc.
@@ -199,14 +215,21 @@ VAR-VAL should be a (VAR VAL) pair."
       auto-save-file-name-transforms `((".*" ,(concat temporary-file-directory "\\2") t))
       )
 
+;; Prefer newest version of a file when loading ambiguous file names.
+(setq load-prefer-newer t)
+
 ;; Delete files to trash.
 (setq delete-by-moving-to-trash t)
 
-;; Power up dired.
+;; Use expanded dired features.
 (require 'dired-x)
+(setq dired-isearch-filenames 'dwim)
 
 ;; Save place in files when closing Emacs.
 ;; (desktop-save-mode)
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file (concat user-emacs-directory "places"))
 
 ;; View files in read-only mode.
 (setq view-read-only t)
@@ -225,7 +248,7 @@ VAR-VAL should be a (VAR VAL) pair."
 
 
 ;;----------------------------------------------------------------------------
-;; Basic editing
+;; Basic editing preferences
 ;;----------------------------------------------------------------------------
 
 ;; Disable tabs, but give them the "standard" width by default.
@@ -242,12 +265,10 @@ VAR-VAL should be a (VAR VAL) pair."
 (electric-layout-mode)
 
 ;; Configure scrolling.
-(setq scroll-margin 0 ; Drag the point along while scrolling
-      scroll-conservatively 1000 ; Never recenter the screen while scrolling
-      scroll-error-top-bottom t ; Move to beg/end of buffer before
-                                        ; signalling an error
-      ;; These settings make trackpad scrolling on OS X much more predictable
-      ;; and smooth
+(setq scroll-margin 0 ; Drag the point along while scrolling.
+      scroll-conservatively 1000 ; Never recenter the screen while scrolling.
+      scroll-error-top-bottom t ; Move to beg/end of buffer before signalling an error.
+      ;; These settings make trackpad scrolling on OS X much more predictable and smooth.
       mouse-wheel-progressive-speed nil
       mouse-wheel-scroll-amount '(1))
 
@@ -256,12 +277,12 @@ VAR-VAL should be a (VAR VAL) pair."
 (put 'downcase-region 'disabled nil)
 
 ;; Show matching delimiters.
-(show-paren-mode)
+(show-paren-mode 1)
 
 ;; Add custom highlights to buffers.
 (global-hi-lock-mode 1)
 
-;; Make `kill-whole-line' indentation aware
+;; Make `kill-whole-line' indentation aware.
 (defun my:smart-kill-whole-line (&optional arg)
   "Kill whole line and move back to indentation.
 Kill the whole line with function `kill-whole-line' and then move
@@ -269,7 +290,7 @@ Kill the whole line with function `kill-whole-line' and then move
   (interactive "p")
   (kill-whole-line arg)
   (back-to-indentation))
-(global-set-key [remap kill-whole-line] #'my:smart-kill-whole-line)
+;;(global-set-key [remap kill-whole-line] #'my:smart-kill-whole-line)
 
 ;; Make `kill-line' indentation-aware.
 (defun my:smart-backward-kill-line ()
@@ -277,7 +298,7 @@ Kill the whole line with function `kill-whole-line' and then move
   (interactive)
   (kill-line 0)
   (indent-according-to-mode))
-(global-set-key (kbd "C-S-<backspace>") #'my:smart-backward-kill-line) ; C-S-backspace
+;;(global-set-key (kbd "C-S-<backspace>") #'my:smart-backward-kill-line) ; C-S-backspace
 
 ;; Open empty line below the current line.
 (defun my:smart-open-line ()
@@ -285,7 +306,7 @@ Kill the whole line with function `kill-whole-line' and then move
   (interactive)
   (move-end-of-line nil)
   (newline-and-indent))
-(global-set-key (kbd "S-<return>") #'my:smart-open-line)
+;;(global-set-key (kbd "S-<return>") #'my:smart-open-line)
 
 ;; Make C-a toggle between beginning of line and indentation
 (defun my:back-to-indentation-or-beginning-of-line (arg)
@@ -306,10 +327,16 @@ point reaches the beginning or end of the buffer, stop there."
     (back-to-indentation)
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
+;;(global-set-key [remap move-beginning-of-line] #'my:back-to-indentation-or-beginning-of-line)
+
+;; Replace zap-to-char with zap-UP-to-char
+(autoload 'zap-up-to-char "misc"
+  "Kill up to, but not including ARGth occurrence of CHAR." t)
+(global-set-key (kbd "M-z") 'zap-up-to-char)
 
 
 ;;----------------------------------------------------------------------------
-;; Platform-specific configuration
+;; Platform-specific configuration settings
 ;;----------------------------------------------------------------------------
 
 ;; PATH modification helper function
@@ -320,74 +347,91 @@ point reaches the beginning or end of the buffer, stop there."
     (setq exec-path (split-string new-path path-separator))))
 
 ;; Ensure proper integration with external environment.
-(cond ((string-equal system-type "windows-nt")
-       ;; Ensure Cygwin binaries appear at the front of the Emacs exe search path
-       ;; (and before other Windows system and app paths).
-       (my:prepend-to-PATH "C:/Cygwin/bin")
+(cond
+ 
+ ;; ------------ Windows emacs ------------
+ 
+ ((string-equal system-type "windows-nt")
+  ;; Ensure Cygwin binaries appear at the front of the Emacs exe search path
+  ;; (and before other Windows system and app paths).
+  (my:prepend-to-PATH "C:/Cygwin/bin")
+  
+  ;; Cygwin settings (for use with NT Emacs).
+  (require 'setup-cygwin)
+  (if (require 'cygwin-mount nil t)
+      (progn (require 'setup-cygwin)
+             (cygwin-mount-activate)
+             (set-shell-bash)
+             )
+    )
 
-       ;; Cygwin settings (for use with NT Emacs).
-       (require 'setup-cygwin)
-       (if (require 'cygwin-mount nil t)
-           (progn (require 'setup-cygwin)
-                  (cygwin-mount-activate)
-                  (set-shell-bash)
-                  )
-         )
+  ;; TLS/SSL settings (help GNUTLS find Cygwin cert stores)
+  (eval-after-load "gnutls"
+    '(progn
+       (setq gnutls-trustfiles '("c:/cygwin/usr/ssl/certs/ca-bundle.trust.crt"
+                                 "c:/cygwin/usr/ssl/certs/ca-bundle.crt"))))
+  
+  ;; Tramp settings
+  (cond  ((eq window-system 'w32)
+          (setq tramp-default-method "scpx"))
+         (t
+          (setq tramp-default-method "scpc")))
+  
+  ;; Use Cygwin ASpell instead of ISpell
+  (setq-default ispell-program-name "aspell")
+  
+  ;; Browser configuration
+  (setq browse-url-browser-function 'browse-url-firefox)
+  
+  (setq-default comint-process-echoes 'on)
+  
+  ;; Cincinnati office printer
+  (setq printer-name "//uschipr0.chi.sap.corp/CIN1_CO")
+  )
 
-       ;; TLS/SSL settings (help GNUTLS find Cygwin cert stores)
-       (eval-after-load "gnutls"
-         '(progn
-            (setq gnutls-trustfiles '("c:/cygwin/usr/ssl/certs/ca-bundle.trust.crt"
-                                      "c:/cygwin/usr/ssl/certs/ca-bundle.crt"))))
-       
-       ;; Tramp settings
-       (cond  ((eq window-system 'w32)
-               (setq tramp-default-method "scpx"))
-              (t
-               (setq tramp-default-method "scpc")))
+ ;; ------------ Cygwin emacs ------------
+ 
+ ((string-equal system-type "cygwin")
+  ;; Ensure Cygwin binaries come before Windows paths.
+  (my:prepend-to-PATH "/bin")
+  
+  ;; Include Windows file extensions when searching for executables.
+  (setq-default exec-suffixes (append '(".exe" ".com" ".bat" ".cmd" ".btm") exec-suffixes))
+  
+  ;; Translate Windows file paths to Cygwin paths.
+  ;;(load "custom/windows-path.el")
+  ;;(windows-path-activate)
 
-       ;; Use Cygwin ASpell instead of ISpell
-       (setq-default ispell-program-name "aspell")
+  ;; Set shell to Bash
+  (setq shell-file-name "/bin/bash")
 
-       ;; Browser configuration
-       (setq browse-url-browser-function 'browse-url-firefox)
+  ;; Use ASpell instead of ISpell
+  (setq-default ispell-program-name "aspell")
 
-       (setq-default comint-process-echoes 'on)
+  ;; Browser configuration
+  (setq browse-url-browser-function 'browse-url-firefox)
+  )
 
-       ;; Cincinnati office printer
-       (setq printer-name "//uschipr0.chi.sap.corp/CIN1_CO")
-       )
-      ((string-equal system-type "cygwin")
-       ;; Ensure Cygwin binaries come before Windows paths.
-       (my:prepend-to-PATH "/bin")
+ ;; ------------ Linux ------------
+ 
+ ((string-equal system-type "gnu/linux")
+  )
 
-       ;; Include Windows file extensions when searching for executables.
-       (setq-default exec-suffixes (append '(".exe" ".com" ".bat" ".cmd" ".btm") exec-suffixes))
-
-       ;; Translate Windows file paths to Cygwin paths.
-       ;;(load "custom/windows-path.el")
-       ;;(windows-path-activate)
-
-       ;; Set shell to Bash
-       (setq shell-file-name "/bin/bash")
-
-       ;; Use ASpell instead of ISpell
-       (setq-default ispell-program-name "aspell")
-
-       ;; Browser configuration
-       (setq browse-url-browser-function 'browse-url-firefox)
-       )
-      ((string-equal system-type "gnu/linux")
-       )
-      ((string-equal system-type "darwin")
-       ;; (require 'exec-path-from-shell) ;; if not using the ELPA package
-       ;; (exec-path-from-shell-initialize)
+ ;; ------------ OS X ------------
+ 
+ ((string-equal system-type "darwin")
+  (require 'exec-path-from-shell) ;; if not using the ELPA package
+  (exec-path-from-shell-initialize)
        )
        ;; Use homebrew ASpell instead of ISpell (brew install aspell --lang=en)
        (setq-default ispell-program-name "aspell")
       )
 
+
+;;----------------------------------------------------------------------------
 ;; Default windows size & position.
+;;----------------------------------------------------------------------------
+
 (cond ((string-equal window-system "w32")
        (setq default-frame-alist
              '((top . 20) (left . 100)
@@ -490,12 +534,18 @@ point reaches the beginning or end of the buffer, stop there."
 
 (defun my:css-mode-hook ()
   ;; indent automatically
-  (local-set-key (kbd "RET") 'newline-and-indent)
+  (local-set g-key (kbd "RET") 'newline-and-indent)
 
   ;; indentation style
   (setq css-indent-offset 2)
   )
 (add-hook 'web-mode-hook  'my:web-mode-hook)
+
+
+;;----------------------------------------------------------------------------
+;; Differencing tools
+;;----------------------------------------------------------------------------
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 
 ;;----------------------------------------------------------------------------
@@ -552,22 +602,22 @@ point reaches the beginning or end of the buffer, stop there."
 ;; IDO options
 ;;----------------------------------------------------------------------------
 
-(require 'ido)
-(ido-mode t)
-(ido-everywhere t)
+;; (require 'ido)
+;; (ido-mode t)
+;; (ido-everywhere t)
 
-(setq ido-enable-flex-matching t ; Enable fuzzy matching
-      ido-create-new-buffer 'always ; Create a new buffer if nothing matches
-      ido-use-filename-at-point 'guess
-      ;; Visit buffers and files in the selected window
-      ido-default-file-method 'selected-window
-      ido-default-buffer-method 'selected-window
-      ido-use-faces nil ; Prefer flx ido faces
-      ido-case-fold t ; be case-insensitive
-      )
-(add-to-list 'ido-ignore-files "\\.DS_Store")
-;(flx-ido-mode) ; Powerful IDO flex matching
-;(ido-vertical-mode) ; Show IDO completions vertically
+;; (setq ido-enable-flex-matching t ; Enable fuzzy matching
+;;       ido-create-new-buffer 'always ; Create a new buffer if nothing matches
+;;       ido-use-filename-at-point 'guess
+;;       ;; Visit buffers and files in the selected window
+;;       ido-default-file-method 'selected-window
+;;       ido-default-buffer-method 'selected-window
+;;       ;;ido-use-faces nil ; Prefer flx ido faces
+;;       ido-case-fold t ; be case-insensitive
+;;       )
+;; (add-to-list 'ido-ignore-files "\\.DS_Store")
+;;(flx-ido-mode) ; Powerful IDO flex matching
+;;(ido-vertical-mode) ; Show IDO completions vertically
 
 
 ;;----------------------------------------------------------------------------
@@ -590,16 +640,15 @@ point reaches the beginning or end of the buffer, stop there."
 
 (if (featurep 'org)
 	(progn
-	  (define-key global-map "\C-cl" 'org-store-link)
-	  (define-key global-map "\C-ca" 'org-agenda)
-	  (define-key global-map "\C-cc" 'org-capture)
+	  ;; (define-key global-map "\C-cl" 'org-store-link)
+	  ;; (define-key global-map "\C-ca" 'org-agenda)
+	  ;; (define-key global-map "\C-cc" 'org-capture)
 	  ))
 
 
 ;;----------------------------------------------------------------------------
 ;; Python mode configuration
 ;;----------------------------------------------------------------------------
-
 
 (require 'python)
 
@@ -611,7 +660,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 (when (eq system-type 'darwin)
   (setq python-shell-interpreter "ipython"
-        python-shell-interpreter-args "-i")
+        ;; python-shell-interpreter-args "-i"
+        )
   )
 
 ;; (setq using-ipython t) ; choose iPython versus std Python shell
@@ -659,13 +709,25 @@ point reaches the beginning or end of the buffer, stop there."
             )
           )
 
+(defun my:python-debug-buffer ()
+  (interactive)
+  (pdb (concat gud-pdb-command-name " " (buffer-file-name))))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (require 'gud)
+            (setq gud-pdb-command-name "python -m pdb")
+            (local-set-key (kbd "<f8>") #'my:python-debug-buffer)
+            )
+          )
+
 
 ;;----------------------------------------------------------------------------
 ;; Uniquify settings
 ;;----------------------------------------------------------------------------
 
-;; (require 'uniquify)
-;; (setq uniquify-buffer-name-style 'forward)
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
 
 
 ;;----------------------------------------------------------------------------
@@ -684,45 +746,42 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Basic key bindings
 ;;----------------------------------------------------------------------------
 
-;; Kill some useless bindings
+;; Improved OS X compatibility
+(when (equal window-system 'ns)
+  (global-set-key (kbd "s-<up>") 'beginning-of-buffer)
+  (global-set-key (kbd "s-<down>") 'end-of-buffer)
+  (global-set-key (kbd "s-<left>") "\C-a")
+  (global-set-key (kbd "s-<right>") "\C-e")
+  )
+
+;; Suspend-frame is annoying in graphic displays.
 (when (display-graphic-p)
-  ;; `suspend-frame' is annoying in graphic displays
   (global-set-key (kbd "C-z") nil)
   )
 
-;; (defun my:hard-newline ()
-;;   "Insert 1 newline without identation, useful to start a fresh Python function."
-;;   (interactive)
-;;   (newline 1))
-;; )
-;; Improve standard bindings
-;;(global-set-key (kbd "RET") 'newline-and-indent)
+;; Steve Yegge's recommended bindings
+;; (global-set-key "\C-x\C-m" 'execute-extended-command)
+;; (global-set-key "\C-c\C-m" 'execute-extended-command)
+;; (global-set-key "\C-x\C-k" 'kill-region)
+;; (global-set-key "\C-c\C-k" 'kill-region)
+
+;; Useful function to force "hard" newline without auto-indenting.
+(defun my:hard-newline ()
+  "Insert 1 newline without identation, useful to start a fresh Python function."
+  (interactive)
+  (newline 1))
 ;;(global-set-key [(control return)] 'my:hard-newline)
 
 ;;(global-set-key [remap execute-extended-command] #'smex)
 (global-set-key [remap list-buffers] #'ibuffer)
 
-(global-set-key [remap move-beginning-of-line] #'my:back-to-indentation-or-beginning-of-line)
 (global-set-key [remap dabbrev-expand] #'hippie-expand)
-;; (global-set-key [remap isearch-forward] #'isearch-forward-regexp)
-;; (global-set-key [remap isearch-backward] #'isearch-backward-regexp)
-;; (global-set-key (kbd "C-M-s") 'isearch-forward)
-;; (global-set-key (kbd "C-M-r") 'isearch-backward)
+
 ;;(global-set-key [remap just-one-space] #'cycle-spacing)
 
 ;; Complement standard bindings (the comments indicate the related bindings)
 ;(global-set-key (kbd "M-X") #'smex-major-mode-commands) ; M-x
 
-;;(global-set-key (kbd "M-Z") #'zap-up-to-char) ; M-z
-;; (global-set-key (kbd "C-h A") #'apropos) ; C-h a
-;; (global-set-key (kbd "C-x p") #'proced) ; C-x p
-
-;; Steve Yegge's recommended bindings
-;(global-set-key "\C-x\C-m" 'execute-extended-command)
-;(global-set-key "\C-c\C-m" 'execute-extended-command)
-;(global-set-key "\C-w" 'backward-kill-word)
-;(global-set-key "\C-x\C-k" 'kill-region)
-;(global-set-key "\C-c\C-k" 'kill-region)
 
 ;; Use C-x,k for killing buffers even if opened from emacsclient
 (global-set-key (kbd "C-x k")
@@ -732,17 +791,9 @@ point reaches the beginning or end of the buffer, stop there."
                      (kill-this-buffer)
                      )))
 
-;; Home toggles between the first char and the first non-whitespace character in the line.
-;(global-set-key [home] 'my:smart-beginning-of-line)
-;(global-set-key (kbd "C-a") 'my:back-to-indentation-or-beginning-of-line)
-
-;; Keys for paging in the "other" window.
-;; (global-set-key "\M-n" "\C-u1\C-v")
-;; (global-set-key "\M-p" "\C-u1\M-v")
-
 ;; Function Key bindings
 
-(global-set-key (kbd "<f8>") 'compile)
+(global-set-key (kbd "<f7>") 'compile)
 
 ;;(global-set-key [f11] 'previous-error)
 ;;(global-set-key [f12] 'next-error)
@@ -763,8 +814,8 @@ point reaches the beginning or end of the buffer, stop there."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
- (custom-set-faces
+)
+(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
