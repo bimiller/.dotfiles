@@ -19,7 +19,7 @@
   (global-set-key (kbd "M-`") 'other-frame))
 
 ;; Shell-compatible line-editing key bindings
-(define-key key-translation-map [?\C-h] [?\C-?]) ;; remap Ctrl-H to Del
+;;(define-key key-translation-map [?\C-h] [?\C-?]) ;; remap Ctrl-H to Del
 ;;(global-set-key "\C-w" 'backward-kill-word)
 
 ;; Highlight region when mark is active.
