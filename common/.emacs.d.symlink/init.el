@@ -47,7 +47,7 @@
 (prefer-coding-system 'utf-8)
 
 ;; I map this to the system tmp directory.
-(setq temporary-file-directory "/tmp/")
+;(setq temporary-file-directory "/tmp/")
 
 ;; Keep backup and auto save files out of the way.
 (setq backup-directory-alist `((".*" . ,(locate-user-emacs-file "backups")))
@@ -245,7 +245,7 @@ VAR-VAL should be a (VAR VAL) pair."
  ((string-equal system-type "windows-nt")
   ;; Ensure Cygwin binaries appear at the front of the Emacs exe search path
   ;; (and before other Windows system and app paths).
-  (my:prepend-to-PATH "C:/Cygwin/bin")
+  (my:prepend-to-PATH "C:/cygwin64/bin")
   
   ;; Cygwin settings (for use with NT Emacs).
   (require 'setup-cygwin)
@@ -259,8 +259,8 @@ VAR-VAL should be a (VAR VAL) pair."
   ;; TLS/SSL settings (help GNUTLS find Cygwin cert stores)
   (eval-after-load "gnutls"
     '(progn
-       (setq gnutls-trustfiles '("c:/cygwin/usr/ssl/certs/ca-bundle.trust.crt"
-                                 "c:/cygwin/usr/ssl/certs/ca-bundle.crt"))))
+       (setq gnutls-trustfiles '("c:/cygwin64/usr/ssl/certs/ca-bundle.trust.crt"
+                                 "c:/cygwin64/usr/ssl/certs/ca-bundle.crt"))))
   
   ;; Tramp settings
   (cond  ((eq window-system 'w32)
