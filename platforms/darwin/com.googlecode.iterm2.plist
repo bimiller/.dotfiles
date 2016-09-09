@@ -647,9 +647,9 @@
 	<key>NSWindow Frame Preferences</key>
 	<string>98 294 924 485 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>230 125 1210 710 0 0 1440 877 </string>
+	<string>230 110 1210 710 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>230 89 1210 710 0 0 1440 877 </string>
+	<string>53 114 1210 710 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>204 190 1210 710 0 0 1440 900 </string>
 	<key>NeverWarnAboutShortLivedSessions_84E54C6E-6069-42C7-9D2C-24FB43C5AAFF</key>
@@ -1440,7 +1440,7 @@
 	<key>PromptOnQuit</key>
 	<true/>
 	<key>QuitWhenAllWindowsClosed</key>
-	<false/>
+	<true/>
 	<key>RightCommand</key>
 	<integer>8</integer>
 	<key>RightOption</key>

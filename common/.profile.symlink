@@ -19,6 +19,12 @@ if [ -f "$HOST_PROFILE" ] ; then
   source "$HOST_PROFILE"
 fi
 
+ping -q -o proxy >/dev/null
+if [ $? == 0 ]; then
+    export http_proxy=http://proxy:8080
+    export https_proxy=${http_proxy}
+fi
+
 # Private settings (not shared on GitHub).
 
 if [ -f "${HOME}/.profile_private" ]; then
@@ -30,6 +36,9 @@ fi
 if [ -d "${HOME}/bin" ] ; then
   export PATH="${HOME}/bin:${PATH}"
 fi
+
+# Set CDPATH to include common project directories.
+export CDPATH=~::$HOME:$HOME/Projects
 
 # If running bash then source the bashrc file.
 
