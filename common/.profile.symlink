@@ -1,17 +1,47 @@
 
-# Set user-defined locale
-#export LANG=$(locale -uU)
+# Default tool settings.
 
-export ALTERNATE_EDITOR=emacs
-export EDITOR=emacsclient
-export VISUAL=emacsclient
-
+export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
+export VISUAL="mvim -f"
 export LESS="-R"
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
-# This file is not read by bash(1) if ~/.bash_profile or ~/.bash_login
-# exists.
-#
-# if running bash
+# HANA XSA client tools
+
+if [ -d "${HOME}/Tools/XSA/bin" ] ; then
+  export PATH="${HOME}/Tools/XSA/bin:${PATH}"
+fi
+
+# Host-specific settings.
+
+HOST_PROFILE="${HOME}/.profile_$(hostname)"
+if [ -f "$HOST_PROFILE" ] ; then
+  source "$HOST_PROFILE"
+fi
+
+ping -q -o proxy >/dev/null
+if [ $? == 0 ]; then
+    export http_proxy=http://proxy:8080
+    export https_proxy=${http_proxy}
+fi
+
+# Private settings (not shared on GitHub).
+
+if [ -f "${HOME}/.profile_private" ]; then
+  source "${HOME}/.profile_private"
+fi
+
+# Set PATH so it includes user's private bin if it exists.
+
+if [ -d "${HOME}/bin" ] ; then
+  export PATH="${HOME}/bin:${PATH}"
+fi
+
+# Set CDPATH to include common project directories.
+export CDPATH=~::$HOME:$HOME/Projects
+
+# If running bash then source the bashrc file.
+
 if [ -n "${BASH_VERSION}" ]; then
   if [ -f "${HOME}/.bashrc" ]; then
     source "${HOME}/.bashrc"
