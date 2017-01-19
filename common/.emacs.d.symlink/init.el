@@ -474,9 +474,15 @@ VAR-VAL should be a (VAR VAL) pair."
 ;; C/C++ mode customizations
 ;;----------------------------------------------------------------------------
 
-(setq c-default-style "bsd")	    ; standard for HANA development
-(setq c-basic-offset 4)		        ; standard for HANA development
-
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.c\\'" . c++-mode))
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq c-default-style "bsd")	    ; standard for HANA development
+            (setq c-basic-offset 4)		        ; standard for HANA development
+            (setq tab-width 4)
+            (ggtags-mode t)
+            ))
 
 ;;----------------------------------------------------------------------------
 ;; CSS mode customizations
