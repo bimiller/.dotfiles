@@ -1,0 +1,60 @@
+
+# Default tool settings.
+
+export PS1="\W \$ "
+export EDITOR='vim'
+#export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
+export VISUAL=$EDITOR
+export LESS="-R"
+export PAGER=less
+
+# Use Homebrew coretutils instead of ancient Mac versions.
+
+if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
+    export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
+    export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:${MANPATH-/usr/share/man}"
+fi
+
+# Set PATH so it includes user's private bin if it exists.
+
+if [ -d "${HOME}/bin" ] ; then
+  export PATH="${HOME}/bin:${PATH}"
+fi
+
+# Python development settings.
+
+# Java development settings.
+
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+
+# HANA XSA client tools.
+
+if [ -d "${HOME}/Documents/SAP/XSA/bin" ] ; then
+  export PATH="${HOME}/Documents/SAP/XSA/bin:${PATH}"
+fi
+
+# Detect and configure SAP SAP proxy settings.
+
+ping -q -o proxy &>/dev/null
+if [ $? == 0 ]; then
+    export http_proxy=http://proxy:8080
+    export https_proxy=${http_proxy}
+fi
+
+# Private settings (not shared on GitHub).
+
+if [ -f "${HOME}/.profile_private" ]; then
+  source "${HOME}/.profile_private"
+fi
+
+# If running bash then source the bashrc file.
+
+if [ -n "${BASH_VERSION}" ]; then
+  if [ -f "${HOME}/.bashrc" ]; then
+    source "${HOME}/.bashrc"
+  fi
+fi
+
+# happy make (installed on 2016-10-12 15:50:02.968116)
+source /Users/i817332/.HappyMake/etc/hminit.sh
+

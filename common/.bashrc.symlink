@@ -1,23 +1,21 @@
 
-# If not running interactively, don't do anything
+# Shell options for interactive use.
 
-[[ "$-" != *i* ]] && return
-
-# Use case-insensitive filename globbing
-
-shopt -s nocaseglob
+shopt -s nocaseglob     # Use case-insensitive filename globbing
+set -o noclobber        # Help prevent accidental overwrites with redirection
+set -o vi               # Use VI mode for editing command line
 
 # Alias basic utils to use preferred defaults (also use Homebrew coreutils on Mac)
 
-if [ $(uname -s) == "Darwin" ]; then
-    alias ls='gls -hF --color=auto'
-    alias dircolors='gdircolors'
-    alias find='gfind'
-    alias du='gdu -h'
-else
+#if [ $(uname -s) == "Darwin" ]; then
+#    alias ls='gls -hF --color=auto'
+#    alias dircolors='gdircolors'
+#    alias find='gfind'
+#    alias du='gdu -h'
+#else
     alias ls='ls -hF --color=auto'
     alias du='du -h'
-fi
+#fi
 
 alias rm='rm -i'
 alias cp='cp -i'
@@ -35,38 +33,11 @@ alias ll='ls -l'
 alias la='ls -A'
 alias lal="ls -Al"
 
-alias e='vim'
-
-function doPrompt {
-
-	# define colors
-	local BLACK="\[\033[0;30;47m\]"
-	local RED="\[\033[1;31;47m\]"
-	local GREEN="\[\033[0;32;47m\]"
-	local YELLOW="\[\033[0;33;47m\]"
-	local BLUE="\[\033[1;34;47m\]"
-	local MAGENTA="\[\033[0;35;47m\]"
-	local CYAN="\[\033[0;36;47m\]"
-	local WHITE="\[\033[1;37;47m\]"
-	
-	# define bg colors
-	local BG_BLACK="\[\033[40m\]"
-	local BG_RED="\[\033[41m\]"
-	local BG_GREEN="\[\033[42m\]"
-	local BG_YELLOW="\[\033[43m\]"
-	local BG_BLUE="\[\033[44m\]"
-	local BG_MAGENTA="\[\033[45m\]"
-	local BG_CYAN="\[\033[46m\]"
-	local BG_WHITE="\[\033[48m\]"
-	
-	# define prompt
-	# export PS1="${BLACK}\t${BLACK}# "
-	export PS1="\[\e[1m\]\$ \[\e[22m\]"
-}
-
-doPrompt
+# Set LS_COLORS env variable
 
 eval "`dircolors -b ~/.dir_colors`"
+
+# Include any host-specific settings.
 
 HOST_BASHRC="${HOME}/.bashrc_$(hostname)"
 if [ -f "$HOST_BASHRC" ] ; then

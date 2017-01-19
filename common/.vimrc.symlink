@@ -85,7 +85,7 @@ if maparg('<C-L>', 'n') ==# ''
 endif
 set ignorecase          " ignore case when searching
 set smartcase           " unless I specify some uppercase letters
-set gdefault            " replace all occurrences on each line by default
+"set gdefault            " replace all occurrences on each line by default
 set tags=./tags;
 
 " Folding
@@ -149,8 +149,8 @@ endfunction
  
 " Switch between files in buffer
 
-nnoremap <C-Tab> :bn<CR>
-nnoremap <C-S-Tab> :bp<CR>
+noremap <C-Tab> :bn<CR>
+noremap <C-S-Tab> :bp<CR>
 
 " Navigate through errors, grep results, etc.
 

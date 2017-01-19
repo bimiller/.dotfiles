@@ -99,3 +99,6 @@ set mark-symlinked-directories on
 # Alt+Left/Right to move by whole words
 "\e\e[C": forward-word
 "\e\e[D": backward-word
+
+#set editing-mode vi
+
