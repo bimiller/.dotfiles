@@ -23,14 +23,33 @@ fi
 
 # Python development settings.
 
+#export PYTHONPATH=<path to hdbapi>
+
 # Java development settings.
 
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+if [ $(uname -s) == "Darwin" ]; then
+    export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+else
+    export JAVA_HOME=/opt/jdk1.8.0_60
+fi
 
-# HANA XSA client tools.
+if [ -d "${JAVA_HOME}/bin" ] ; then
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+fi
 
-if [ -d "${HOME}/Documents/SAP/XSA/bin" ] ; then
-  export PATH="${HOME}/Documents/SAP/XSA/bin:${PATH}"
+# SAP development environment.
+
+if [ -d "/SAPDevelop/bin" ] ; then
+    export PATH="/SAPDevelop/bin:${PATH}"
+fi
+
+if [ -d "/SAPDevelop/XSA/bin" ] ; then
+    export PATH="/SAPDevelop/XSA/bin:${PATH}"
+fi
+
+if [ -d "/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir/bin" ] ; then
+    export PATH="/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir/bin:${PATH}"
+    #export LD_LIBRARY_PATH=/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir:/SAPDevelop/tasdk/src/build/Debug/gen:/SAPDevelop/tasdk/src/build/Debug/gen/filter
 fi
 
 # Detect and configure SAP SAP proxy settings.
@@ -39,6 +58,7 @@ ping -q -o proxy &>/dev/null
 if [ $? == 0 ]; then
     export http_proxy=http://proxy:8080
     export https_proxy=${http_proxy}
+    export no_proxy="$(hostname -f), $(hostname), $no_proxy"
 fi
 
 # Private settings (not shared on GitHub).

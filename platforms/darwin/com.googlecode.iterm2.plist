@@ -476,13 +476,6 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
-		<key>0x9-0x40000</key>
-		<dict>
-			<key>Action</key>
-			<integer>32</integer>
-			<key>Text</key>
-			<string></string>
-		</dict>
 		<key>0xf700-0x300000</key>
 		<dict>
 			<key>Action</key>
@@ -659,9 +652,9 @@
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 141 606 456 0 0 1440 877 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>303 229 918 498 0 0 1440 877 </string>
+	<string>303 300 1016 502 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>3 166 1210 711 0 0 1440 877 </string>
+	<string>0 189 1440 688 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>230 127 1210 711 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
