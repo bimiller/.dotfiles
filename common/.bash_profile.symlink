@@ -15,10 +15,20 @@ if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
     export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:${MANPATH-/usr/share/man}"
 fi
 
+# Enable Bash completions when using Homebrew Bash
+
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+
 # Set PATH so it includes user's private bin if it exists.
 
 if [ -d "${HOME}/bin" ] ; then
   export PATH="${HOME}/bin:${PATH}"
+fi
+
+# SAP HANA client tools.
+
+if [ -d "/usr/sap/hdbclient" ]; then
+    export PATH="/usr/sap/hdbclient:${PATH}"
 fi
 
 # Python development settings.
@@ -47,9 +57,18 @@ if [ -d "/SAPDevelop/XSA/bin" ] ; then
     export PATH="/SAPDevelop/XSA/bin:${PATH}"
 fi
 
-if [ -d "/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir/bin" ] ; then
-    export PATH="/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir/bin:${PATH}"
-    #export LD_LIBRARY_PATH=/SAPDevelop/tasdk/src/build/Debug/gen/dat_bin_dir:/SAPDevelop/tasdk/src/build/Debug/gen:/SAPDevelop/tasdk/src/build/Debug/gen/filter
+if [ -d "/hana/shared/WAM/xs/bin" ]; then
+    export PATH="/hana/shared/WAM/xs/bin:${PATH}"
+fi
+
+export TASDK_BUILD_TYPE="Debug"
+
+export DAT_BIN_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/dat_bin_dir/"
+export TASDK_LANG_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/sar_dat_lexicon/trexlanguages"
+
+if [ -d "${DAT_BIN_DIR}" ] ; then
+    export PATH="${DAT_BIN_DIR}:${PATH}"
+    export LD_LIBRARY_PATH="${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter"
 fi
 
 # Detect and configure SAP SAP proxy settings.

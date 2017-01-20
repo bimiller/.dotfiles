@@ -17,7 +17,7 @@ set -o noclobber        # Help prevent accidental overwrites with redirection
     alias du='du -h'
 #fi
 
-alias rm='rm -i'
+alias rm='rm -I'
 alias cp='cp -i'
 alias mv='mv -i'
 
@@ -39,6 +39,13 @@ alias lal="ls -Al"
 
 eval "`dircolors -b ~/.dir_colors`"
 
+# Simplify jumping to favorite directories.
+
+CDPATH=.:~/Projects
+if [ -d "/SAPDevelop" ]; then
+    CDPATH="$CDPATH:/SAPDevelop"
+fi
+
 # Special GDB option required on MacOS.
 
 if [ $(uname -s) == "Darwin" ]; then
@@ -49,6 +56,9 @@ fi
 
 alias hmd='hm build -b Debug -j 20 -m 80'
 alias hmo='hm build -b Optimized -j 20 -m 80'
+
+alias ncc="${DAT_BIN_DIR}/tf_ncc -d ${TASDK_LANG_DIR}"
+alias cgc="${DAT_BIN_DIR}/tf_cgc"
 
 # Include any host-specific settings.
 
