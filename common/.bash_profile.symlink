@@ -63,12 +63,13 @@ fi
 
 export TASDK_BUILD_TYPE="Debug"
 
-export DAT_BIN_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/dat_bin_dir/"
+export DAT_BIN_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/dat_bin_dir"
 export TASDK_LANG_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/sar_dat_lexicon/trexlanguages"
 
 if [ -d "${DAT_BIN_DIR}" ] ; then
     export PATH="${DAT_BIN_DIR}:${PATH}"
-    export LD_LIBRARY_PATH="${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter"
+    export LD_LIBRARY_PATH="${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter:${LD_LIBRARY_PATH}"
+    export DYLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DYLD_LIBRARY_PATH}"
 fi
 
 # Detect and configure SAP SAP proxy settings.
