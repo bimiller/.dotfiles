@@ -3,7 +3,7 @@
 
 shopt -s nocaseglob     # Use case-insensitive filename globbing
 set -o noclobber        # Help prevent accidental overwrites with redirection
-set -o vi               # Use VI mode for editing command line
+#set -o vi               # Use VI mode for editing command line
 
 # Alias basic utils to use preferred defaults (also use Homebrew coreutils on Mac)
 

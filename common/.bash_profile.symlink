@@ -76,5 +76,5 @@ if [ -n "${BASH_VERSION}" ]; then
 fi
 
 # happy make (installed on 2016-10-12 15:50:02.968116)
-source /Users/i817332/.HappyMake/etc/hminit.sh
+source ~/.HappyMake/etc/hminit.sh
 
