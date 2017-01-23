@@ -47,6 +47,11 @@ if [ -d "${JAVA_HOME}/bin" ] ; then
     export PATH="${JAVA_HOME}/bin:${PATH}"
 fi
 
+# C/C++ development settings.
+
+export CFLAGS="--std=c11 -O0 -g -Wall"
+export CXXFLAGS="--std=c++11 -O0 -g -Wall"
+
 # SAP development environment.
 
 if [ -d "/SAPDevelop/bin" ] ; then
@@ -96,5 +101,6 @@ if [ -n "${BASH_VERSION}" ]; then
 fi
 
 # happy make (installed on 2016-10-12 15:50:02.968116)
-source ~/.HappyMake/etc/hminit.sh
-
+if [ -f "${HOME}/.HappyMake/etc/hminit.sh" ]; then
+    source "${HOME}/.HappyMake/etc/hminit.sh"
+fi
