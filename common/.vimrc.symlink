@@ -124,7 +124,7 @@ endfunction
 
 " C-language settings
 
-autocmd filetype c call SetCOptions()
+autocmd filetype c\|c++ call SetCOptions()
 function SetCOptions()
     setlocal tabstop=4
     setlocal softtabstop=4

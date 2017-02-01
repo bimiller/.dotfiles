@@ -12,7 +12,7 @@ export PAGER=less
 
 if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
     export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
-    export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:${MANPATH-/usr/share/man}"
+    export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:/usr/local/share/man:${MANPATH-/usr/share/man}"
 fi
 
 # Enable Bash completions when using Homebrew Bash
