@@ -54,7 +54,7 @@ set ttimeoutlen=100
 
 colorscheme zenburn
 syntax enable	        " enable syntax highlighting
-set number              " show line numbers
+set nonumber            " don't show line numbers
 set showmode            " show VIM mode in bottom bar
 set showcmd             " show pending command in bottom bar
 set ruler               " show cursor position in bottom bar
@@ -131,7 +131,7 @@ function SetCOptions()
     setlocal shiftwidth=4
     setlocal expandtab
     setlocal autoindent
-    map <F7> :make "CFLAGS=-g -Wall -std=gnu11 -O0" %:t:r<CR>
+    noremap <buffer> <F7> :make "CFLAGS=-g -Wall -std=gnu11 -O0" %:t:r<CR>
 endfunction
 
 " Python settings
@@ -143,9 +143,13 @@ function SetPythonOptions()
     setlocal shiftwidth=4
     setlocal expandtab
     setlocal autoindent
+    nnoremap <buffer> <F7> :exec '!clear; python' shellescape(@%, 1)<cr>
+    filetype on
 endfunction
 
-"let mapleader=","       " default \ is too hard to reach
+" Use spacebar for <leader>, but in a way that preserves showcmd (somewhat)
+"let mapleader = "\<Space>"
+map <Space> <leader>
  
 " Switch between files in buffer
 
@@ -169,10 +173,10 @@ map <F5> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
 map <F6> :Dox<CR>
 
 " build using makeprg with <F7>
-map <F7> :make<CR>
+"map <F7> :make<CR>
 
 " build using makeprg with <S-F7>
-map <S-F7> :make clean all<CR>
+"map <S-F7> :make clean all<CR>
 
 " goto definition with F12
 map <F12> <C-]>
