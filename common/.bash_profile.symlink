@@ -47,6 +47,18 @@ if [ -d "${JAVA_HOME}/bin" ] ; then
     export PATH="${JAVA_HOME}/bin:${PATH}"
 fi
 
+# Hadoop/Spark development settings.
+
+if [ -d "/SAPDevelop/hadoop/hadoop-2.7.3" ]; then
+    export HADOOP_HOME="/SAPDevelop/hadoop/hadoop-2.7.3"
+    export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
+fi
+
+if [ -d "/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7" ]; then
+    export SPARK_HOME="/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7"
+    export PATH="$SPARK_HOME/bin:$PATH"
+fi
+
 # C/C++ development settings.
 
 export CFLAGS="--std=c11 -O0 -g -Wall"
