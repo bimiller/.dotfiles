@@ -10,11 +10,12 @@
 
 ;; Switch Command and Option keys on Macs.
 (when (equal window-system 'ns)
-  (setq  ns-command-modifier 'meta ; use Command as Meta
-         ns-option-modifier 'super ; use Option as Command
+  (setq  ;ns-command-modifier 'meta ; use Command as Meta
+         ;ns-option-modifier 'super ; use Option as Command
          ns-right-command-modifier 'left ; right and left Command are the same
          ns-right-option-modifier 'left ; right and left Opt are the same
-         ns-function-modifier 'hyper)
+	 ;ns-function-modifier 'hyper
+	 )
   (global-set-key (kbd "M-`") 'other-frame)
 )
 
