@@ -2,7 +2,7 @@
 # Default tool settings.
 
 export PS1="\W \$ "
-export EDITOR='vim'
+export EDITOR='subl -w'
 #export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
 export VISUAL=$EDITOR
 export LESS="-R"
@@ -33,7 +33,14 @@ fi
 
 # Python development settings.
 
-#export PYTHONPATH=<path to hdbapi>
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+
+export PYTHON_CONFIGURE_OPTS="--enable-framework"
+
+if [ -d "/Applications/sap/hdbclient" ]; then
+    export PYTHONPATH="/Applications/sap/hdbclient"
+fi
 
 # Java development settings.
 
@@ -59,6 +66,12 @@ if [ -d "/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7" ]; then
     export PATH="$SPARK_HOME/bin:$PATH"
 fi
 
+# Apache UIMA development settings.
+
+if [ -d "/SAPDevelop/tools/uima/apache-uima" ]; then
+    export UIMA_HOME="/SAPDevelop/tools/uima/apache-uima"
+fi
+
 # C/C++ development settings.
 
 export CFLAGS="--std=c11 -O0 -g -Wall"
@@ -70,8 +83,8 @@ if [ -d "/SAPDevelop/bin" ] ; then
     export PATH="/SAPDevelop/bin:${PATH}"
 fi
 
-if [ -d "/SAPDevelop/XSA/bin" ] ; then
-    export PATH="/SAPDevelop/XSA/bin:${PATH}"
+if [ -d "/Applications/sap/XSA/bin" ] ; then
+    export PATH="/Applications/sap/XSA/bin:${PATH}"
 fi
 
 if [ -d "/hana/shared/WAM/xs/bin" ]; then
@@ -91,11 +104,12 @@ fi
 
 # Detect and configure SAP SAP proxy settings.
 
-ping -q -o proxy &>/dev/null
+host proxy &>/dev/null
+#ping -q -o proxy &>/dev/null
 if [ $? == 0 ]; then
     export http_proxy=http://proxy:8080
     export https_proxy=${http_proxy}
-    export no_proxy="$(hostname -f), $(hostname), $no_proxy"
+    export no_proxy="$(hostname -f), $(hostname), .sap.corp, .corp.sap, $no_proxy"
 fi
 
 # Private settings (not shared on GitHub).
@@ -112,7 +126,9 @@ if [ -n "${BASH_VERSION}" ]; then
   fi
 fi
 
-# happy make (installed on 2016-10-12 15:50:02.968116)
 if [ -f "${HOME}/.HappyMake/etc/hminit.sh" ]; then
     source "${HOME}/.HappyMake/etc/hminit.sh"
 fi
+
+# happy make (installed on 2017-07-21 13:34:50.328915)
+source /Users/i817332/.HappyMake/etc/hminit.sh

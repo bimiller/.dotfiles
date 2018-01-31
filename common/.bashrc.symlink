@@ -52,6 +52,11 @@ if [ $(uname -s) == "Darwin" ]; then
     alias gdb='gdb -iex "set startup-with-shell off"'
 fi
 
+# Shortcuts for Python interpreters
+
+alias ip='ipython3'
+alias py='python3'
+
 # Shortcuts for HANA development.
 
 alias hmd='hm build -b Debug -j 20 -m 80'
