@@ -2,45 +2,48 @@
 # Default tool settings.
 
 export PS1="\W \$ "
-export EDITOR='subl -w'
-#export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
+#export EDITOR='subl -w'
+export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
 export VISUAL=$EDITOR
 export LESS="-R"
 export PAGER=less
 
-# Use Homebrew coretutils instead of ancient Mac versions.
+# Use Homebrew utils instead of ancient Mac versions.
 
 if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
     export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
     export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:/usr/local/share/man:${MANPATH-/usr/share/man}"
 fi
 
+if [ -d "/usr/local/opt/findutils/libexec/gnubin" ]; then
+    export PATH="/usr/local/opt/findutils/libexec/gnubin:${PATH}"
+    export MANPATH="/usr/local/opt/findutils/libexec/gnuman:/usr/local/share/man:${MANPATH-/usr/share/man}"
+fi
+
+if [ -d "/Applications/MacVim.app/Contents/bin" ]; then
+    export PATH="/Applications/MacVim.app/Contents/bin:${PATH}"
+fi
+
 # Enable Bash completions when using Homebrew Bash
 
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
-# Set PATH so it includes user's private bin if it exists.
-
-if [ -d "${HOME}/bin" ] ; then
-  export PATH="${HOME}/bin:${PATH}"
-fi
-
-# SAP HANA client tools.
-
-if [ -d "/usr/sap/hdbclient" ]; then
-    export PATH="/usr/sap/hdbclient:${PATH}"
-fi
-
 # Python development settings.
 
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"              # insert pyenv shims into PATH
+    eval "$(pyenv virtualenv-init -)"   # include virtualenv support
 
-export PYTHON_CONFIGURE_OPTS="--enable-framework"
+#    export PYTHON_CONFIGURE_OPTS="--enable-shared"     # required for many (gui) modules
 
-if [ -d "/Applications/sap/hdbclient" ]; then
-    export PYTHONPATH="/Applications/sap/hdbclient"
+    #export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 fi
+
+export PIP_REQUIRE_VIRTUALENV=true
+
+export PIPENV_DEFAULT_PYTHON_VERSION="3.6"
+
+export NLTK_DATA="~/Documents/Datasets/nltk_data"
 
 # Java development settings.
 
@@ -51,65 +54,13 @@ else
 fi
 
 if [ -d "${JAVA_HOME}/bin" ] ; then
-    export PATH="${JAVA_HOME}/bin:${PATH}"
+    export PATH="${PATH}:${JAVA_HOME}/bin"
 fi
 
-# Hadoop/Spark development settings.
+# Set PATH so it includes user's private bin if it exists.
 
-if [ -d "/SAPDevelop/hadoop/hadoop-2.7.3" ]; then
-    export HADOOP_HOME="/SAPDevelop/hadoop/hadoop-2.7.3"
-    export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
-fi
-
-if [ -d "/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7" ]; then
-    export SPARK_HOME="/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7"
-    export PATH="$SPARK_HOME/bin:$PATH"
-fi
-
-# Apache UIMA development settings.
-
-if [ -d "/SAPDevelop/tools/uima/apache-uima" ]; then
-    export UIMA_HOME="/SAPDevelop/tools/uima/apache-uima"
-fi
-
-# C/C++ development settings.
-
-export CFLAGS="--std=c11 -O0 -g -Wall"
-export CXXFLAGS="--std=c++11 -O0 -g -Wall"
-
-# SAP development environment.
-
-if [ -d "/SAPDevelop/bin" ] ; then
-    export PATH="/SAPDevelop/bin:${PATH}"
-fi
-
-if [ -d "/Applications/sap/XSA/bin" ] ; then
-    export PATH="/Applications/sap/XSA/bin:${PATH}"
-fi
-
-if [ -d "/hana/shared/WAM/xs/bin" ]; then
-    export PATH="/hana/shared/WAM/xs/bin:${PATH}"
-fi
-
-export TASDK_BUILD_TYPE="Debug"
-
-export DAT_BIN_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/dat_bin_dir"
-export TASDK_LANG_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/sar_dat_lexicon/trexlanguages"
-
-if [ -d "${DAT_BIN_DIR}" ] ; then
-    export PATH="${DAT_BIN_DIR}:${PATH}"
-    export LD_LIBRARY_PATH="${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter:${LD_LIBRARY_PATH}"
-    export DYLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DYLD_LIBRARY_PATH}"
-fi
-
-# Detect and configure SAP SAP proxy settings.
-
-host proxy &>/dev/null
-#ping -q -o proxy &>/dev/null
-if [ $? == 0 ]; then
-    export http_proxy=http://proxy:8080
-    export https_proxy=${http_proxy}
-    export no_proxy="$(hostname -f), $(hostname), .sap.corp, .corp.sap, $no_proxy"
+if [ -d "${HOME}/bin" ] ; then
+  export PATH="${PATH}:${HOME}/bin"
 fi
 
 # Private settings (not shared on GitHub).
@@ -126,9 +77,3 @@ if [ -n "${BASH_VERSION}" ]; then
   fi
 fi
 
-if [ -f "${HOME}/.HappyMake/etc/hminit.sh" ]; then
-    source "${HOME}/.HappyMake/etc/hminit.sh"
-fi
-
-# happy make (installed on 2017-07-21 13:34:50.328915)
-source /Users/i817332/.HappyMake/etc/hminit.sh

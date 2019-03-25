@@ -29,41 +29,29 @@ alias fgrep='fgrep --color=auto'
 
 alias tmux='tmux -CC'
 
+alias view='vim -R'
+
 # Shortcuts for popular options & commands
 
 alias ll='ls -l'
 alias la='ls -A'
 alias lal="ls -Al"
 
+alias nb='jupyter notebook'
+
+# Eliminate Homebrew 'doctor' complaints about Pyenv shims in PATH
+
+alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
+
 # Set LS_COLORS env variable
 
 eval "`dircolors -b ~/.dir_colors`"
-
-# Simplify jumping to favorite directories.
-
-CDPATH=.:~/Projects
-if [ -d "/SAPDevelop" ]; then
-    CDPATH="$CDPATH:/SAPDevelop"
-fi
 
 # Special GDB option required on MacOS.
 
 if [ $(uname -s) == "Darwin" ]; then
     alias gdb='gdb -iex "set startup-with-shell off"'
 fi
-
-# Shortcuts for Python interpreters
-
-alias ip='ipython3'
-alias py='python3'
-
-# Shortcuts for HANA development.
-
-alias hmd='hm build -b Debug -j 20 -m 80'
-alias hmo='hm build -b Optimized -j 20 -m 80'
-
-alias ncc="${DAT_BIN_DIR}/tf_ncc -d ${TASDK_LANG_DIR}"
-alias cgc="${DAT_BIN_DIR}/tf_cgc"
 
 # Include any host-specific settings.
 
