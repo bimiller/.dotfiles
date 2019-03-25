@@ -37,7 +37,6 @@ alias ll='ls -l'
 alias la='ls -A'
 alias lal="ls -Al"
 
-<<<<<<< HEAD
 #alias e='subl -w'
 alias e=emacs
 alias ec=emacsclient
@@ -49,24 +48,8 @@ alias nb='jupyter notebook'
 alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
 
 # Set LS_COLORS env variable
-=======
-alias nb='jupyter notebook'
->>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
-
-# Eliminate Homebrew 'doctor' complaints about Pyenv shims in PATH
-
-alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
-
-<<<<<<< HEAD
-#CDPATH=.:~/Projects
-#if [ -d "/SAPDevelop" ]; then
-#    CDPATH="$CDPATH:/SAPDevelop"
-#fi
-=======
-# Set LS_COLORS env variable
 
 eval "`dircolors -b ~/.dir_colors`"
->>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
 
 # Special GDB option required on MacOS.
 

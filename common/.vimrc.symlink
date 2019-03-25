@@ -1,8 +1,4 @@
 
-<<<<<<< HEAD
-set nocompatible
-filetype plugin on
-=======
 set nocompatible            " Enable VIM extensions
 set modelines=0             " disable modelines (for security reasons, plus I have never used them)
 set nomodeline
@@ -141,5 +137,4 @@ nnoremap <Space> <Nop>		" (also need to suppress normal mode SPC function)
 " Permit project-specific Vim settings
 "set exrc
 "set secure
->>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
 
