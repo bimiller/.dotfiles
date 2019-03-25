@@ -2,9 +2,12 @@
 # Default tool settings.
 
 export PS1="\W \$ "
-export EDITOR='vim'
+#export EDITOR='subl -w'
 #export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
-export VISUAL=$EDITOR
+#export EDITOR="emacs -nw"
+export ALTERNATE_EDITOR=emacs
+export EDITOR=emacsclient
+export VISUAL="$EDITOR"
 export LESS="-R"
 export PAGER=less
 
@@ -17,23 +20,28 @@ fi
 
 # Enable Bash completions when using Homebrew Bash
 
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-
-# Set PATH so it includes user's private bin if it exists.
-
-if [ -d "${HOME}/bin" ] ; then
-  export PATH="${HOME}/bin:${PATH}"
-fi
-
-# SAP HANA client tools.
-
-if [ -d "/usr/sap/hdbclient" ]; then
-    export PATH="/usr/sap/hdbclient:${PATH}"
+if [ -f /usr/local/etc/bash_completion ]; then
+    source /usr/local/etc/bash_completion
 fi
 
 # Python development settings.
 
-#export PYTHONPATH=<path to hdbapi>
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"              # insert pyenv shims into PATH
+    eval "$(pyenv virtualenv-init -)"   # include virtualenv support
+
+    #export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+fi
+
+export PIP_REQUIRE_VIRTUALENV=true
+
+export PIPENV_DEFAULT_PYTHON_VERSION="3.6"
+
+# SAP HANA client tools.
+
+if [ -d "/usr/sap/hdbclient" ]; then
+    export PATH="${PATH}:/usr/sap/hdbclient"
+fi
 
 # Java development settings.
 
@@ -44,38 +52,33 @@ else
 fi
 
 if [ -d "${JAVA_HOME}/bin" ] ; then
-    export PATH="${JAVA_HOME}/bin:${PATH}"
+    export PATH="${PATH}:${JAVA_HOME}/bin"
 fi
 
 # Hadoop/Spark development settings.
 
 if [ -d "/SAPDevelop/hadoop/hadoop-2.7.3" ]; then
     export HADOOP_HOME="/SAPDevelop/hadoop/hadoop-2.7.3"
-    export PATH="$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
+    export PATH="$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"
 fi
 
 if [ -d "/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7" ]; then
     export SPARK_HOME="/SAPDevelop/spark/spark-2.1.0-bin-hadoop2.7"
-    export PATH="$SPARK_HOME/bin:$PATH"
+    export PATH="$PATH:$SPARK_HOME/bin"
 fi
-
-# C/C++ development settings.
-
-export CFLAGS="--std=c11 -O0 -g -Wall"
-export CXXFLAGS="--std=c++11 -O0 -g -Wall"
 
 # SAP development environment.
 
 if [ -d "/SAPDevelop/bin" ] ; then
-    export PATH="/SAPDevelop/bin:${PATH}"
+    export PATH="${PATH}:/SAPDevelop/bin"
 fi
 
 if [ -d "/SAPDevelop/XSA/bin" ] ; then
-    export PATH="/SAPDevelop/XSA/bin:${PATH}"
+    export PATH="${PATH}:/SAPDevelop/XSA/bin"
 fi
 
 if [ -d "/hana/shared/WAM/xs/bin" ]; then
-    export PATH="/hana/shared/WAM/xs/bin:${PATH}"
+    export PATH="${PATH}:/hana/shared/WAM/xs/bin"
 fi
 
 export TASDK_BUILD_TYPE="Debug"
@@ -84,18 +87,24 @@ export DAT_BIN_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/dat_bin_dir"
 export TASDK_LANG_DIR="/SAPDevelop/tasdk/build/${TASDK_BUILD_TYPE}/gen/sar_dat_lexicon/trexlanguages"
 
 if [ -d "${DAT_BIN_DIR}" ] ; then
-    export PATH="${DAT_BIN_DIR}:${PATH}"
-    export LD_LIBRARY_PATH="${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter:${LD_LIBRARY_PATH}"
-    export DYLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DYLD_LIBRARY_PATH}"
+    export PATH="${PATH}:${DAT_BIN_DIR}"
+    export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DAT_BIN_DIR}:${DAT_BIN_DIR}/..:${DAT_BIN_DIR}/filter"
+    export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${LD_LIBRARY_PATH}"
 fi
 
 # Detect and configure SAP SAP proxy settings.
 
-ping -q -o proxy &>/dev/null
-if [ $? == 0 ]; then
-    export http_proxy=http://proxy:8080
-    export https_proxy=${http_proxy}
-    export no_proxy="$(hostname -f), $(hostname), $no_proxy"
+#ping -q -o proxy &>/dev/null
+#if [ $? == 0 ]; then
+#    export http_proxy=http://proxy:8080
+#    export https_proxy=${http_proxy}
+#    export no_proxy="$(hostname -f), $(hostname), $no_proxy"
+#fi
+
+# Set PATH so it includes user's private bin if it exists.
+
+if [ -d "${HOME}/bin" ] ; then
+  export PATH="${PATH}:${HOME}/bin"
 fi
 
 # Private settings (not shared on GitHub).
@@ -116,3 +125,4 @@ fi
 if [ -f "${HOME}/.HappyMake/etc/hminit.sh" ]; then
     source "${HOME}/.HappyMake/etc/hminit.sh"
 fi
+

@@ -35,21 +35,31 @@ alias ll='ls -l'
 alias la='ls -A'
 alias lal="ls -Al"
 
+#alias e='subl -w'
+alias e=emacs
+alias ec=emacsclient
+
+alias nb='jupyter notebook'
+
+# Eliminate Homebrew 'doctor' complaints about Pyenv shims in PATH
+
+alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
+
 # Set LS_COLORS env variable
 
 eval "`dircolors -b ~/.dir_colors`"
 
 # Simplify jumping to favorite directories.
 
-CDPATH=.:~/Projects
-if [ -d "/SAPDevelop" ]; then
-    CDPATH="$CDPATH:/SAPDevelop"
-fi
+#CDPATH=.:~/Projects
+#if [ -d "/SAPDevelop" ]; then
+#    CDPATH="$CDPATH:/SAPDevelop"
+#fi
 
 # Special GDB option required on MacOS.
 
 if [ $(uname -s) == "Darwin" ]; then
-    alias gdb='gdb -iex "set startup-with-shell off"'
+    alias gdb='gdb -iex "set startup-with-shell off" -q'
 fi
 
 # Shortcuts for HANA development.
