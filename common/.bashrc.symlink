@@ -29,12 +29,15 @@ alias fgrep='fgrep --color=auto'
 
 alias tmux='tmux -CC'
 
+alias view='vim -R'
+
 # Shortcuts for popular options & commands
 
 alias ll='ls -l'
 alias la='ls -A'
 alias lal="ls -Al"
 
+<<<<<<< HEAD
 #alias e='subl -w'
 alias e=emacs
 alias ec=emacsclient
@@ -46,29 +49,30 @@ alias nb='jupyter notebook'
 alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
 
 # Set LS_COLORS env variable
+=======
+alias nb='jupyter notebook'
+>>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
 
-eval "`dircolors -b ~/.dir_colors`"
+# Eliminate Homebrew 'doctor' complaints about Pyenv shims in PATH
 
-# Simplify jumping to favorite directories.
+alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
 
+<<<<<<< HEAD
 #CDPATH=.:~/Projects
 #if [ -d "/SAPDevelop" ]; then
 #    CDPATH="$CDPATH:/SAPDevelop"
 #fi
+=======
+# Set LS_COLORS env variable
+
+eval "`dircolors -b ~/.dir_colors`"
+>>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
 
 # Special GDB option required on MacOS.
 
 if [ $(uname -s) == "Darwin" ]; then
     alias gdb='gdb -iex "set startup-with-shell off" -q'
 fi
-
-# Shortcuts for HANA development.
-
-alias hmd='hm build -b Debug -j 20 -m 80'
-alias hmo='hm build -b Optimized -j 20 -m 80'
-
-alias ncc="${DAT_BIN_DIR}/tf_ncc -d ${TASDK_LANG_DIR}"
-alias cgc="${DAT_BIN_DIR}/tf_cgc"
 
 # Include any host-specific settings.
 

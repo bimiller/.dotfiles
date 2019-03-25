@@ -1,5 +1,145 @@
-" Enable VIM extensions
 
+<<<<<<< HEAD
 set nocompatible
 filetype plugin on
+=======
+set nocompatible            " Enable VIM extensions
+set modelines=0             " disable modelines (for security reasons, plus I have never used them)
+set nomodeline
+
+" Standard Vundle setup
+
+filetype off                  " required
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+call vundle#end()             " required
+
+" General customizations
+
+if has('autocmd')
+  filetype plugin indent on     " enable extended file type handling
+endif
+if has('syntax') && !exists('g:syntax_on')
+  syntax enable                 " enable syntax highlighting
+endif
+
+set hidden              	" switch between buffers w/o saving
+set encoding=utf-8      	" use UTF-8 within VIM
+set autoread            	" automatically reload changed file (if not changed within VIM)
+
+set backspace=indent,eol,start  " backspace over anything when inserting
+set smarttab                    " insert tabs on the start of a line according to shiftwidth (not tabstop)
+set softtabstop=4		" use 4 spaces per tab by default
+set shiftwidth=4		" use 4 spaces for autoindent by default
+set expandtab			" convert TABs to spaces by default
+
+set ttimeout                    " time out on :mappings and key codes
+set ttimeoutlen=100             " after this number of ms
+
+set ruler                   	" show cursor position in bottom bar
+set cursorline          	" highlight current line
+set wildmenu                	" visual autocomplete for command menu
+set laststatus=2        	" always show status line (even if only one window present)
+
+set autoindent              	" copy indent from previous line 
+set nrformats-=octal        	" don't assume octal for numbers with leading zero
+
+if !&scrolloff
+  set scrolloff=1           	" min number of screen lines to keep above/below cursor
+endif
+if !&sidescrolloff
+  set sidescrolloff=5       	" min number of screen columns to keep around cursor
+endif
+
+set display+=lastline       	" show some portion of (truncated) last line
+
+set showcmd			" Show partial commands in the last line of the screen
+
+set listchars=eol:$,extends:>,precedes:<,nbsp:+     " visual markers for :list mode
+
+if v:version > 703 || v:version == 703 && has("patch541")
+  set formatoptions+=j      	" Delete comment character when joining commented lines
+endif
+
+if has("gui_running")		" GUI mode settings
+    if has("gui_macvim")
+        let macvim_skip_colorscheme=1
+    endif
+    set guifont=Consolas:h12,Menlo:h15 " My favorite fonts
+    "set guifontwide=NSimSun
+    set lines=36 columns=150
+    winp 100 30
+endif
+
+colorscheme zenburn
+
+" Search features
+
+set incsearch               	" begin searching as characters are entered
+set hlsearch            	" highlight matches
+
+set ignorecase          	" ignore case when searching
+set smartcase           	" unless I specify some uppercase letters
+
+if has('path_extra')
+  setglobal tags-=./tags tags-=./tags; tags^=./tags;
+endif
+
+" Load matchit.vim, but only if the user hasn't installed a newer version.
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+  runtime! macros/matchit.vim
+endif
+
+" Custom filetype-specific settings
+
+autocmd filetype make 	setlocal noexpandtab
+
+autocmd filetype c\|c++ setlocal softtabstop=4 shiftwidth=4 expandtab
+
+autocmd filetype python setlocal softtabstop=4 shiftwidth=4 expandtab
+
+autocmd filetype python nnoremap <buffer> <F7> :exec '!clear; python' shellescape(@%, 1)<cr>
+
+" Custom key bindings
+
+map Y y$			" Make Y act like D and C (i.e. yank until EOL)
+
+inoremap <C-U> <C-G>u<C-U>  	" start a new undo change with ^U in insert mode
+
+if maparg('<C-L>', 'n') ==# ''	" Use <C-L> to clear the highlighting of :set hlsearch.
+  nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+endif
+
+map <C-j> :cn<CR>		" Navigate through errors, grep results, etc.
+map <C-k> :cp<CR>		" Navigate through errors, grep results, etc.
+
+" toggle 'paste' option (disables 'autoindent')
+set pastetoggle=<F11>
+let mapleader=" "		" use SPC for leader
+
+nnoremap <Space> <Nop>		" (also need to suppress normal mode SPC function)
+
+" switch between header/source with F4
+"map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
+" recreate tags file with F5
+"map <F5> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
+" create doxygen comment
+"map <F6> :Dox<CR>
+
+" build using makeprg with <F7>
+"map <F7> :make<CR>
+
+" build using makeprg with <S-F7>
+"map <S-F7> :make clean all<CR>
+
+" goto definition with F12
+"map <F12> <C-]>
+
+" Permit project-specific Vim settings
+"set exrc
+"set secure
+>>>>>>> 6cc59d9be4f16441666e59e018e214a9fb2b428e
 
