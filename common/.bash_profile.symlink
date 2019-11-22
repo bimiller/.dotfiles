@@ -1,27 +1,34 @@
 
 # Default tool settings.
 
-export PS1="\W \$ "
-#export EDITOR='subl -w'
-#export EDITOR="mvim -f -c \"au VimLeave * maca hide:\""
-#export EDITOR="emacs -nw"
-export ALTERNATE_EDITOR=emacs
+export PS1='\W \$ '
 export EDITOR=emacsclient
+export ALTERNATE_EDITOR=emacs
+#export EDITOR="emacs -nw"
+#export EDITOR='mvim -f --nomru -c "au VimLeave * maca hide:"'
 export VISUAL="$EDITOR"
 export LESS="-R"
 export PAGER=less
 
 # Use Homebrew utils instead of ancient Mac versions.
 
+export PATH="/usr/local/bin:/usr/local/sbin:${PATH/:\/usr\/local\/bin}"
+#export MANPATH="/usr/local/share/man:/usr/share/man"
+
 if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
     export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
-    export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:/usr/local/share/man:${MANPATH-/usr/share/man}"
+    #export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}"
+    eval "`dircolors -b ~/.dir_colors`"  # Set LS_COLORS env variable
 fi
 
 if [ -d "/usr/local/opt/findutils/libexec/gnubin" ]; then
     export PATH="/usr/local/opt/findutils/libexec/gnubin:${PATH}"
-    export MANPATH="/usr/local/opt/findutils/libexec/gnuman:/usr/local/share/man:${MANPATH-/usr/share/man}"
+    #export MANPATH="/usr/local/opt/findutils/libexec/gnuman:${MANPATH}"
 fi
+
+#if [ -d "/Applications/Emacs.app/Contents/Resources/man" ]; then
+#    export MANPATH="/Applications/Emacs.app/Contents/Resources/man:$MANPATH"
+#fi
 
 if [ -d "/Applications/MacVim.app/Contents/bin" ]; then
     export PATH="/Applications/MacVim.app/Contents/bin:${PATH}"
@@ -39,16 +46,16 @@ if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"              # insert pyenv shims into PATH
     eval "$(pyenv virtualenv-init -)"   # include virtualenv support
 
-#    export PYTHON_CONFIGURE_OPTS="--enable-shared"     # required for many (gui) modules
-
-    #export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+#    export PYTHON_CONFIGURE_OPTS="--enable-framework"  # required for many (gui) modules
+    
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 fi
 
 export PIP_REQUIRE_VIRTUALENV=true
 
 export PIPENV_DEFAULT_PYTHON_VERSION="3.6"
 
-export NLTK_DATA="~/Documents/Datasets/nltk_data"
+#export NLTK_DATA="~/Documents/Datasets/nltk_data"
 
 # Java development settings.
 
@@ -60,6 +67,24 @@ fi
 
 if [ -d "${JAVA_HOME}/bin" ] ; then
     export PATH="${PATH}:${JAVA_HOME}/bin"
+fi
+
+# Spark development settings
+
+SPARK_HOME=`ls -d $HOME/Tools/spark-[0-9]*`
+
+if [ -d "$SPARK_HOME" ] ; then
+    export SPARK_HOME
+    export PATH="$PATH:$SPARK_HOME/bin"
+fi
+
+# Hadoop development settings
+
+HADOOP_HOME=`ls -d $HOME/Tools/hadoop-[0-9]*`
+
+if [ -d "$HADOOP_HOME" ] ; then
+    export HADOOP_HOME
+    export PATH="$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"
 fi
 
 # Set PATH so it includes user's private bin if it exists.

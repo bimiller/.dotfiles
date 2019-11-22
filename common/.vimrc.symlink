@@ -62,7 +62,7 @@ if has("gui_running")		" GUI mode settings
     if has("gui_macvim")
         let macvim_skip_colorscheme=1
     endif
-    set guifont=Consolas:h12,Menlo:h15 " My favorite fonts
+    set guifont=Consolas:h12,Monaco:h14,Menlo:h15 " My favorite fonts
     "set guifontwide=NSimSun
     set lines=36 columns=150
     winp 100 30

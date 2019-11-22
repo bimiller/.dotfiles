@@ -3,7 +3,6 @@
 
 shopt -s nocaseglob     # Use case-insensitive filename globbing
 set -o noclobber        # Help prevent accidental overwrites with redirection
-#set -o vi               # Use VI mode for editing command line
 
 # Alias basic utils to use preferred defaults (also use Homebrew coreutils on Mac)
 
@@ -38,18 +37,16 @@ alias la='ls -A'
 alias lal="ls -Al"
 
 #alias e='subl -w'
-alias e=emacs
-alias ec=emacsclient
+#alias e=emacs
+#alias ec=emacsclient
 
 alias nb='jupyter notebook'
+
+alias cloudera='docker run --hostname=quickstart.cloudera --privileged=true -t -i -v /Users/bill/sandbox:/sandbox -p 80:80 -p 8888:8888 cloudera/quickstart /usr/bin/docker-quickstart'
 
 # Eliminate Homebrew 'doctor' complaints about Pyenv shims in PATH
 
 alias brew='env PATH=${PATH//$(pyenv root)\/shims:/} brew'
-
-# Set LS_COLORS env variable
-
-eval "`dircolors -b ~/.dir_colors`"
 
 # Special GDB option required on MacOS.
 
