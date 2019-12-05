@@ -38,7 +38,7 @@ alias lal="ls -Al"
 
 #alias e='subl -w'
 #alias e=emacs
-#alias ec=emacsclient
+alias ec=emacsclient
 
 alias nb='jupyter notebook'
 

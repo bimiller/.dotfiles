@@ -4,7 +4,15 @@
 
 (require 'package)
 (add-to-list 'package-archives  '("melpa" . "https://melpa.org/packages/") t)
+(setq package-enable-at-startup nil)
 (package-initialize)
+
+;; Bootstrap 'use-package'
+
+;; (unless (package-installed-p 'use-package)
+;;   (package-refresh-contents)
+;;   (package-install 'use-package)
+;;   (require 'use-package'))
 
 ;;----------------------------------------------------------------------------
 ;; Switch Command and Option keys on Macs.
@@ -39,53 +47,31 @@
 ;;----------------------------------------------------------------------------
 
 (setq mark-even-if-inactive nil	; only use mark when region is visible
-      transient-mark-mode 1   ; region is not always active
+      transient-mark-mode 1     ; region is not always active
       sentence-end-double-space nil
       )
 
-(setq-default indent-tabs-mode nil)	; use SPCs instead of TABs
+(setq-default indent-tabs-mode nil)	; use SPCs instead of TABs generally
 
 (delete-selection-mode 1) ; typing replaces the actively selected text
-
-;; Use ^H to backspace (F1 for help).
-
-;;(global-unset-key (kbd "C-h"))		; break the habit first
-;;(define-key key-translation-map [?\C-h] [?\C-?])
-;;(global-set-key (kbd "<f1>") 'help-command)
 
 ;; Make C-d erase active region.
 
 (global-set-key (kbd "C-d") 'delete-forward-char)
 
+;; Use ^H to backspace (F1 for help).
+
+;;(define-key key-translation-map [?\C-h] [?\C-?])
+;;(global-set-key (kbd "<f1>") 'help-command)
+
 ;; Use ^W to kill previous word when no selection is active.
 
-;; (defun my:kill-region-or-backward-word ()
-;;   (interactive)
-;;   (if (region-active-p)
-;;       (kill-region (region-beginning) (region-end))
-;;     (backward-kill-word 1)))
-;; (global-set-key (kbd "C-w") 'my:kill-region-or-backward-word)
-
-;; Use M-w to copy-line when no selection is active.
-
-;; (defun my:copy-line (arg)
-;;   "Copy to end of line, or as many lines as prefix argument"
-;;   (interactive "P")
-;;   (if (null arg)
-;;       (progn (kill-ring-save (point)
-;; 			     (line-end-position))
-;; 	     (message "Copied to end of line"))
-;;     (let ((cnt (prefix-numeric-value arg)))
-;;       (kill-ring-save (line-beginning-position)
-;; 		      (line-beginning-position (+ 1 arg)))
-;;       (message "%d line%s copied" arg (if (= 1 arg) "" "s")))))
-
-;; (defun my:save-region-or-current-line (arg)
-;;   (interactive "P")
-;;   (if (region-active-p)
-;;       (kill-ring-save (region-beginning) (region-end))
-;;     (my:copy-line arg)))
-;; (global-set-key (kbd "M-w") 'my:save-region-or-current-line)
+(defun my:kill-region-or-backward-word ()
+  (interactive)
+  (if (region-active-p)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word 1)))
+(global-set-key (kbd "C-w") 'my:kill-region-or-backward-word)
 
 ;; Swap zap-to-char for more generally useful zap-up-to-char.
 
@@ -140,10 +126,8 @@
 
 (when (not (equal window-system 'ns))
   (menu-bar-mode -1))			; hide menubar (except on MacOS)
-
 (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1))			; hide toolbar
-
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1)
   (horizontal-scroll-bar-mode -1)	; vertical scroll bars only
@@ -187,58 +171,164 @@
 (add-hook 'find-file-hooks 'my:find-file-check-make-large-file-read-only-hook)
 
 ;;----------------------------------------------------------------------------
-;; Improved navigation
+;; Editing extensions
 ;;----------------------------------------------------------------------------
+
+;; Precise navigation with minimal keystrokes
+
+;; (require 'avy)
+
+;; (avy-setup-default)                   ; use C-' to jump within isearch
+
+;; (global-set-key (kbd "C-'") 'avy-goto-char)
+;; (global-set-key (kbd "M-g w") 'avy-goto-word-or-subword-1)
+;; (global-set-key (kbd "M-g j") 'avy-goto-char-2)
+;; (global-set-key (kbd "M-g l") 'avy-goto-line)
+
+;; (setq avy-background t)         ; darken background to hilight markers
+;; (setq avy-style 'at-full)       ; show markers on top of target text
+
+;; Enhanced marking and killing.
+
+(require 'expand-region)
+
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Spell-checking
+
+(require 'flyspell)
+
+(setq ispell-program-name "aspell" ; use aspell instead of ispell
+      ispell-extra-args '("--sug-mode=ultra"))
+
+(add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
+
+(add-hook 'prog-mode-hook (lambda () (flyspell-prog-mode)))
+
+;; Multi-cursor editing
+
+(require 'iedit)
+
+;; Easily move current line or region up and down
+
+;; (require 'move-text)
+
+;; (move-text-default-bindings)
+
+;; Smart handling of paired syntactic constructs
+
+(require 'smartparens)
+(require 'smartparens-config)
+(setq sp-base-key-bindings 'paredit)
+(setq sp-autoskip-closing-pair 'always)
+(setq sp-hybrid-kill-entire-symbol nil)
+(sp-use-paredit-bindings)
+
+;; Operate on current line if no region is active.
+
+;; (require 'whole-line-or-region)
+
+;; (add-to-list 'whole-line-or-region-extensions-alist
+;;              '(comment-dwim whole-line-or-region-comment-dwim nil))
+;; (whole-line-or-region-mode 1)
+
+;; Enhanced navigation to start/end of line.
 
 (require 'mwim)
 
 (global-set-key (kbd "C-a") 'mwim-beginning)
 (global-set-key (kbd "C-e") 'mwim-end)
 
-;;----------------------------------------------------------------------------
-;; Operate on current line if no region is active.
-;;----------------------------------------------------------------------------
+;; Enhanced zap-to-char functions
 
-(require 'whole-line-or-region)
-
-(add-to-list 'whole-line-or-region-extensions-alist
-             '(comment-dwim whole-line-or-region-comment-dwim nil))
-(whole-line-or-region-mode 1)
+(require 'zop-to-char)
 
 ;;----------------------------------------------------------------------------
-;; Expand/contract region selection based on "semantic" units
+;; User interface extensions
 ;;----------------------------------------------------------------------------
 
-(require 'expand-region)
+;; Easily navigate between windows.
 
-(global-set-key (kbd "C-=") 'er/expand-region)
+(require 'ace-window)
 
-;; (require 'change-inner)
+(global-set-key [remap other-window] 'ace-window)
 
-;; (global-set-key (kbd "M-i") 'change-inner)
-;; (global-set-key (kbd "M-o") 'change-outer)
+(setq-default ace-window-display-mode t)
 
-;;----------------------------------------------------------------------------
-;; Display help for key sequences.
-;;----------------------------------------------------------------------------
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
-(require 'which-key)
-(which-key-mode)
+;; Momentarily highlight cursor after scrolling.
 
-;;----------------------------------------------------------------------------
+(require 'beacon)
+
+;; Enhanced Emacs completion and narrowing.
+
+(add-to-list 'completion-ignored-extensions ".DS_Store") ; MacOS detritus
+
+(require 'ido)
+
+(ido-mode 1)
+(setq ido-auto-merge-work-directories-length -1 ; disable dir merging
+      ido-case-fold t               ; case-insensitive completions
+      ido-create-new-buffer 'always ; create a new buffer if nothing matches
+      ido-enable-flex-matching t    ; enable fuzzy matching
+      ido-everywhere t        ; enable for all buffer/file completions
+      ido-ignore-extensions t ; ignore files with certain extensions
+      ido-use-faces nil       ; prefer flx ido faces
+      )
+
+(require 'flx-ido)                      ; smarter fuzzy matching
+
+(flx-ido-mode 1)
+(setq ido-use-faces nil)                ; prefer flx ido faces
+
+(require 'ido-vertical-mode)         ; display IDO completions vertically
+
+(ido-vertical-mode)
+(setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+
+;; Enhanced buffer management.
+
+(require 'ibuffer)
+
+;; (global-set-key (kbd "C-x C-b") 'ibuffer)
+(defalias 'list-buffers 'ibuffer) ; make ibuffer default
+
 ;; Use portion of directory path to make buffer names unique.
-;;----------------------------------------------------------------------------
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-;;----------------------------------------------------------------------------
 ;; Save place in files when closing Emacs.
-;;----------------------------------------------------------------------------
 
 ;; (require 'saveplace)
 ;; (setq-default save-place t)
 ;; (setq save-place-file (concat user-emacs-directory "places"))
+
+;; Smarter extended command interface.
+
+(require 'smex)
+
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+
+;;(global-set-key [remap execute-extended-command] #'smex)
+
+;; Visual interface to undo history
+
+(require 'undo-tree)
+(global-undo-tree-mode)
+(setq undo-tree-mode-lighter "")
+
+;; Display help for key sequences automatically.
+
+(require 'which-key)
+(which-key-mode)
 
 ;;----------------------------------------------------------------------------
 ;; Dired customizations
@@ -293,6 +383,15 @@
 	    ;; (global-set-key (kbd "s-p") 'comint-previous-input)
             ))
 
+;;----------------------------------------------------------------------------
+;; Ack configuration
+;;----------------------------------------------------------------------------
+
+;; (require 'ack-and-a-half)
+;; (defalias 'ack 'ack-and-a-half)
+;; (defalias 'ack-same 'ack-and-a-half-same)
+;; (defalias 'ack-find-file 'ack-and-a-half-find-file)
+;; (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
 
 ;;----------------------------------------------------------------------------
 ;; Org-mode customizations
@@ -306,114 +405,43 @@
   (define-key global-map "\C-cl" 'org-store-link)
   (define-key global-map "\C-ca" 'org-agenda)
   (define-key global-map "\C-cc" 'org-capture)
+
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   )
-
-;;----------------------------------------------------------------------------
-;; Completion
-;;----------------------------------------------------------------------------
-
-(global-set-key (kbd "M-/") 'hippie-expand)
-
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;;(global-set-key [remap execute-extended-command] #'smex)
-
-;; (require 'ido)
-;; (ido-mode t)
-;; (ido-everywhere t)
-
-;;(setq ido-enable-flex-matching t ; Enable fuzzy matching
-      ;;ido-create-new-buffer 'always ; Create a new buffer if nothing matches
-      ;;ido-use-filename-at-point 'guess
-      ;; Visit buffers and files in the selected window
-      ;;ido-default-file-method 'selected-window
-      ;;ido-default-buffer-method 'selected-window
-      ;;ido-use-faces nil ; Prefer flx ido faces
-;;       ido-case-fold t ; be case-insensitive
-;;       )
-;; (add-to-list 'ido-ignore-files "\\.DS_Store")
-;;(flx-ido-mode) ; Powerful IDO flex matching
-;;(ido-vertical-mode) ; Show IDO completions vertically
-
 
 ;;----------------------------------------------------------------------------
 ;; Version control
 ;;----------------------------------------------------------------------------
 
-;;----------------------------------------------------------------------------
-;; Auto-completion and snippets
-;;----------------------------------------------------------------------------
-
-;; Be sure to load YASnippet before Auto-Complete
-;; (require 'yasnippet)
-;; (yas-global-mode 1)
-
-;; (require 'auto-complete-config)
-;; (add-to-list 'ac-dictionary-directories (locate-user-emacs-file "ac-dict"))
-;; (ac-config-default)
-
-;; (setq-default ac-sources '(ac-source-abbrev
-;;                            ac-source-dictionary
-;;                            ac-source-words-in-same-mode-buffers))
-
-;; from http://truongtx.me/2013/01/06/config-yasnippet-and-autocomplete-on-emacs/
-; set the trigger key so that it can work together with yasnippet on
-; tab key, if the word exists in yasnippet, pressing tab will cause
-; yasnippet to activate, otherwise, auto-complete will
-;; (ac-set-trigger-key "TAB")
-;; (ac-set-trigger-key "<tab>")
-
-;; Start auto-complete after N characters of a word.
-;;(setq ac-auto-start 3)
-
-;; Case sensitivity is important when finding matches.
-;; (setq ac-ignore-case 'smart)
-
+(require 'magit)
 
 ;;----------------------------------------------------------------------------
-;; Ack configuration
+;; Programming extensions
 ;;----------------------------------------------------------------------------
 
-;; (require 'ack-and-a-half)
-;; (defalias 'ack 'ack-and-a-half)
-;; (defalias 'ack-same 'ack-and-a-half-same)
-;; (defalias 'ack-find-file 'ack-and-a-half-find-file)
-;; (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
+;; Project management
 
+(require 'projectile)
 
-;;----------------------------------------------------------------------------
-;; Autopair options
-;;----------------------------------------------------------------------------
+;; Syntax checking
 
-;; (require 'autopair)
-;; (autopair-global-mode)
+(require 'flycheck)
 
+;; Jump to definitions in buffer
 
-;;----------------------------------------------------------------------------
-;; C/C++ mode customizations
-;;----------------------------------------------------------------------------
+(require 'imenu)
 
-;; (setq c-default-style "bsd")	    ; standard for HANA development
-;; (setq c-basic-offset 4)		        ; standard for HANA development
+;; Code snippets
 
+(require 'yasnippet)
+
+;; Code completion
+
+(require 'company)
 
 ;;----------------------------------------------------------------------------
-;; CSS mode customizations
-;;----------------------------------------------------------------------------
-
-;; (require 'css-mode)
-
-;; (defun my:css-mode-hook ()
-;;   ;; indent automatically
-;;   (local-set g-key (kbd "RET") 'newline-and-indent)
-
-;;   ;; indentation style
-;;   (setq css-indent-offset 2)
-;;   )
-
-
-;;----------------------------------------------------------------------------
-;; HTML mode customizations
+;; HTML/CSS editing
 ;;----------------------------------------------------------------------------
 
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
@@ -454,6 +482,15 @@
 ;;         )
 ;;   )
 
+;; CSS mode customizations
+
+;;;; (defun my:css-mode-hook ()
+;;   ;; indent automatically
+;;   (local-set g-key (kbd "RET") 'newline-and-indent)
+
+;;   ;; indentation style
+;;   (setq css-indent-offset 2)
+;;   )
 
 ;;----------------------------------------------------------------------------
 ;; Javascript mode configuration
@@ -484,7 +521,7 @@
 ;; (with-eval-after-load 'python-mode
 ;;   (elpy-enable)
 ;;   )
-  
+
 (add-hook 'python-mode-hook
           (lambda ()
 ;;	    (flycheck-mode 1)
@@ -574,6 +611,13 @@
 ;;           )
 
 ;;----------------------------------------------------------------------------
+;; C/C++ development
+;;----------------------------------------------------------------------------
+
+;; (setq c-default-style "bsd")	    ; standard for HANA development
+;; (setq c-basic-offset 4)		        ; standard for HANA development
+
+;;----------------------------------------------------------------------------
 ;; Allow this Emacs process to be a server for emacsclient.
 ;;----------------------------------------------------------------------------
 
@@ -602,10 +646,5 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit whole-line-or-region python change-inner mwim add-node-modules-path exec-path-from-shell flycheck js2-mode json-mode web-mode which-key zenburn-theme expand-region syndicate))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+    (ace-window org-bullets ido-vertical-mode flx-ido anaconda-mode avy beacon company crux emmet-mode iedit move-text multiple-cursors projectile smartparens smex undo-tree wgrep yasnippet zop-to-char magit whole-line-or-region python mwim add-node-modules-path exec-path-from-shell flycheck js2-mode json-mode web-mode which-key zenburn-theme expand-region syndicate))))
+
