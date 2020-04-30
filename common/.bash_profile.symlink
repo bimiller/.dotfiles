@@ -1,5 +1,6 @@
-
+#-------------------------------------------------------------------
 # Default tool settings.
+#-------------------------------------------------------------------
 
 export PS1='\W \$ '
 export EDITOR=emacsclient
@@ -10,10 +11,14 @@ export VISUAL="$EDITOR"
 export LESS="-R"
 export PAGER=less
 
-# Use Homebrew utils instead of ancient Mac versions.
+#-------------------------------------------------------------------
+# Use Homebrew packages instead of ancient Mac versions.
+#-------------------------------------------------------------------
 
 export PATH="/usr/local/bin:/usr/local/sbin:${PATH/:\/usr\/local\/bin}"
 #export MANPATH="/usr/local/share/man:/usr/share/man"
+
+# GNU core/find utils
 
 if [ -d "/usr/local/opt/coreutils/libexec/gnubin" ]; then
     export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
@@ -26,12 +31,34 @@ if [ -d "/usr/local/opt/findutils/libexec/gnubin" ]; then
     #export MANPATH="/usr/local/opt/findutils/libexec/gnuman:${MANPATH}"
 fi
 
+# Node.js binaries
+
+if [ -d "/usr/local/opt/node@12/bin" ]; then
+    export PATH="/usr/local/opt/node@12/bin:${PATH}"
+fi
+
+# Python(3) binaries
+
+if [ -d "/usr/local/opt/python/libexec/bin" ]; then
+    export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
+fi
+
+# Emacs
+
 #if [ -d "/Applications/Emacs.app/Contents/Resources/man" ]; then
 #    export MANPATH="/Applications/Emacs.app/Contents/Resources/man:$MANPATH"
 #fi
 
+# Macvim
+
 if [ -d "/Applications/MacVim.app/Contents/bin" ]; then
     export PATH="/Applications/MacVim.app/Contents/bin:${PATH}"
+fi
+
+# Add VS Code (code) to PATH.
+
+if [ -d "/Applications/Visual Studio Code.app/Contents/Resources/app/bin" ]; then
+   export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:${PATH}"
 fi
 
 # Enable Bash completions when using Homebrew Bash
@@ -44,14 +71,14 @@ fi
 
 if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"              # insert pyenv shims into PATH
-    eval "$(pyenv virtualenv-init -)"   # include virtualenv support
-
-#    export PYTHON_CONFIGURE_OPTS="--enable-framework"  # required for many (gui) modules
-    
+    if command -v pyenv-virtualenv >/dev/null 2>&1; then
+        eval "$(pyenv virtualenv-init -)"   # include virtualenv support
+    fi
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+    # export PYTHON_CONFIGURE_OPTS="--enable-framework"  # required for many (gui) modules
 fi
 
-export PIP_REQUIRE_VIRTUALENV=true
+export PIP_REQUIRE_VIRTUALENV=true # protect me from myself
 
 export PIPENV_DEFAULT_PYTHON_VERSION="3.6"
 
@@ -107,3 +134,17 @@ if [ -n "${BASH_VERSION}" ]; then
   fi
 fi
 
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+#         . "/opt/anaconda3/etc/profile.d/conda.sh"
+#     else
+#         export PATH="/opt/anaconda3/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# <<< conda initialize <<<
