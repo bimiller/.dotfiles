@@ -25,7 +25,7 @@ alias grep='grep --color'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-alias tmux='tmux -CC'
+#alias tmux='tmux -CC'
 
 alias view='vim -R'
 

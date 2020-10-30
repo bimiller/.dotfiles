@@ -5,12 +5,12 @@
 (require 'package)
 (require 'tls)
 
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/"))
-      tls-checktrust t
-      tls-program '("gnutls-cli --x509cafile %t -p %p %h")
-      load-prefer-newer t)
-(package-initialize)
+(when (eval-when-compile (version< emacs-version "27"))
+  (load "~/.emacs.d/early-init.el")
+  tls-checktrust t
+  tls-program '("gnutls-cli --x509cafile %t -p %p %h")
+  load-prefer-newer t
+  (package-initialize))
 
 ;; Backups & temporary files
 
@@ -23,8 +23,8 @@
 
 (when (equal window-system 'ns)
 
-  (setq ;ns-command-modifier 'meta       ; Cmd is Meta
-        ;ns-option-modifier 'super       ; Opt is Super (bind as "s-")
+  (setq ns-command-modifier 'meta       ; Cmd is Meta
+        ns-option-modifier 'super       ; Opt is Super (bind as "s-")
         ns-function-modifier 'hyper     ; Fn  is Hyper (bind as "H-")
         ns-right-command-modifier 'left ; left/right Cmd keys are equivalent
         ns-right-option-modifier 'left) ; left/right Opt keys are equivalent
@@ -270,21 +270,25 @@
 (require 're-builder)
 (setq reb-re-syntax 'string)
 
+;; Useful extra functions (e.g., string-trim)
+
+(eval-when-compile (require 'subr-x))
+
 ;; Use ^H to backspace (F1 and/or "C-x h" for help).  SOMEDAY/MAYBE
 
 ;; (define-key key-translation-map [?\C-h] [?\C-?])
 ;; (global-set-key (kbd "C-x h") 'help-command)
 
-;; Use ^W to kill previous word when no selection is active.
+;; Use ^W to kill previous word when no selection is active. SOMEDAY/MAYBE
 
-(defun my:kill-region-or-backward-word ()
-  "Kill region or previous word (if no region active)."
-  (interactive)
-  (if (region-active-p)
-     (kill-region (region-beginning) (region-end))
-    (backward-kill-word 1)))
+;; (defun my:kill-region-or-backward-word ()
+;;   "Kill region or previous word (if no region active)."
+;;   (interactive)
+;;   (if (region-active-p)
+;;      (kill-region (region-beginning) (region-end))
+;;     (backward-kill-word 1)))
 
-(global-set-key (kbd "C-w") 'my:kill-region-or-backward-word)
+;; (global-set-key (kbd "C-w") 'my:kill-region-or-backward-word)
 
 ;; Make C-d kill active region.
 
@@ -298,6 +302,10 @@
 
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 (global-set-key (kbd "M-Z") 'zap-to-char)
+
+;; Easily switch back to other window.
+
+(global-set-key (kbd "M-o") 'other-window)
 
 ;;----------------------------------------------------------------------------
 ;; Global extensions and customizations
@@ -331,57 +339,58 @@
 
 ;; Efficient window management.
 
-(use-package ace-window
-  :ensure t
-  :config
-  (set-face-attribute 'aw-leading-char-face nil
-                      :foreground "deep sky blue"
-                      :weight 'bold
-                      :height 3.0)
-  (set-face-attribute 'aw-mode-line-face nil
-                      :inherit 'mode-line-buffer-id
-                      :foreground "lawn green")
-  (setq aw-dispatch-when-more-than 2
-        aw-keys '(?a ?s ?d ?f ?j ?k ?l)
-        aw-dispatch-alist
-        '((?x aw-delete-window "Ace - Delete Window")
-          (?c aw-swap-window "Ace - Swap Window")
-          (?n aw-flip-window)
-          (?v aw-split-window-vert "Ace - Split Vert Window")
-          (?h aw-split-window-horz "Ace - Split Horz Window")
-          (?m delete-other-windows "Ace - Maximize Window")
-          (?g delete-other-windows)
-          (?b balance-windows)
-          (?u (lambda () (progn (winner-undo) (setq this-command 'winner-undo))))
-          (?r winner-redo)
-          (?? aw-show-dispatch-help))
-        ace-window-display-mode t)
-  (when (package-installed-p 'hydra)
-    (defhydra hydra-window-size (:color red)
-      "Windows size"
-      ("h" shrink-window-horizontally "shrink horizontal")
-      ("j" shrink-window "shrink vertical")
-      ("k" enlarge-window "enlarge vertical")
-      ("l" enlarge-window-horizontally "enlarge horizontal"))
-    (defhydra hydra-window-frame (:color red)
-      "Frame"
-      ("f" make-frame "new frame")
-      ("x" delete-frame "delete frame"))
-    (defhydra hydra-window-scroll (:color red)
-      "Scroll other window"
-      ("n" (lambda () (interactive) (scroll-other-window 1)) "scroll up")
-      ("p" (lambda () (interactive) (scroll-other-window-down 1)) "scroll down"))
-    (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
-    (add-to-list 'aw-dispatch-alist '(?o hydra-window-scroll/body) t)
-    (add-to-list 'aw-dispatch-alist '(?\; hydra-window-frame/body) t))
-  ()
-  (global-set-key [remap other-window] 'ace-window)
-  ;; NB: Swap windows with a single prefix argument C-u.
-  ;;     Delete selected window with a double prefix argument, i.e. C-u C-u.
-  (global-set-key (kbd "M-o") (lambda () (interactive)
-                                (let ((aw-dispatch-always t))
-                                  (ace-window t))))
-)
+;; (use-package ace-window
+;;   :ensure t
+;;   :disabled
+;;   :config
+;;   (set-face-attribute 'aw-leading-char-face nil
+;;                       :foreground "deep sky blue"
+;;                       :weight 'bold
+;;                       :height 3.0)
+;;   (set-face-attribute 'aw-mode-line-face nil
+;;                       :inherit 'mode-line-buffer-id
+;;                       :foreground "lawn green")
+;;   (setq aw-dispatch-when-more-than 2
+;;         aw-keys '(?a ?s ?d ?f ?j ?k ?l)
+;;         aw-dispatch-alist
+;;         '((?x aw-delete-window "Ace - Delete Window")
+;;           (?c aw-swap-window "Ace - Swap Window")
+;;           (?n aw-flip-window)
+;;           (?v aw-split-window-vert "Ace - Split Vert Window")
+;;           (?h aw-split-window-horz "Ace - Split Horz Window")
+;;           (?m delete-other-windows "Ace - Maximize Window")
+;;           (?g delete-other-windows)
+;;           (?b balance-windows)
+;;           (?u (lambda () (progn (winner-undo) (setq this-command 'winner-undo))))
+;;           (?r winner-redo)
+;;           (?? aw-show-dispatch-help))
+;;         ace-window-display-mode t)
+;;   (when (package-installed-p 'hydra)
+;;     (defhydra hydra-window-size (:color red)
+;;       "Windows size"
+;;       ("h" shrink-window-horizontally "shrink horizontal")
+;;       ("j" shrink-window "shrink vertical")
+;;       ("k" enlarge-window "enlarge vertical")
+;;       ("l" enlarge-window-horizontally "enlarge horizontal"))
+;;     (defhydra hydra-window-frame (:color red)
+;;       "Frame"
+;;       ("f" make-frame "new frame")
+;;       ("x" delete-frame "delete frame"))
+;;     (defhydra hydra-window-scroll (:color red)
+;;       "Scroll other window"
+;;       ("n" (lambda () (interactive) (scroll-other-window 1)) "scroll up")
+;;       ("p" (lambda () (interactive) (scroll-other-window-down 1)) "scroll down"))
+;;     (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
+;;     (add-to-list 'aw-dispatch-alist '(?o hydra-window-scroll/body) t)
+;;     (add-to-list 'aw-dispatch-alist '(?\; hydra-window-frame/body) t))
+;;   ()
+;;   (global-set-key [remap other-window] 'ace-window)
+;;   ;; NB: Swap windows with a single prefix argument C-u.
+;;   ;;     Delete selected window with a double prefix argument, i.e. C-u C-u.
+;;   (global-set-key (kbd "M-o") (lambda () (interactive)
+;;                                 (let ((aw-dispatch-always t))
+;;                                   (ace-window t))))
+;; )
 
 ;; (use-package avy
 ;;   :ensure t
@@ -411,35 +420,35 @@
 ;;   ;;(browse-kill-ring-default-keybindings)
 ;;   (global-set-key (kbd "s-y") 'browse-kill-ring))
 
-(use-package company
-  :ensure t
-  :diminish ""
-  :bind (;; ([remap completion-at-point] . company-complete-common)
-         :map company-active-map
-         ;; ([remap completion-at-point] . company-complete-common)
-         ;; ([remap complete-symbol] . company-complete-common)
-         ("C-f" . company-complete-common)
-         ("C-n" . company-select-next-or-abort)
-         ("C-p" . company-select-previous-or-abort))
-  :hook (after-init . global-company-mode)
-  :config
-  (setq company-echo-delay 0.0
-        company-idle-delay 1.0
-        company-minimum-prefix-length 3
-        company-require-match 'never
-        company-selection-wrap-around t
-        company-show-numbers t
-        company-tooltip-align-annotations t
-        company-tooltip-flip-when-above nil
-        company-transformers '(company-sort-by-backend-importance
-                               company-sort-prefer-same-case-prefix)
-        )
-;;   (setq company-dabbrev-downcase nil
-;;         company-dabbrev-ignore-case zt
-;;         company-dabbrev-other-buffers t)
-;;   (setq company-dabbrev-code-everywhere t)
-  ;; (company-tng-configure-default) ; use TAB to select completions
-  )
+;; (use-package company
+;;   :ensure t
+;;   :diminish ""
+;;   :bind (;; ([remap completion-at-point] . company-complete-common)
+;;          :map company-active-map
+;;          ;; ([remap completion-at-point] . company-complete-common)
+;;          ;; ([remap complete-symbol] . company-complete-common)
+;;          ("C-f" . company-complete-common)
+;;          ("C-n" . company-select-next-or-abort)
+;;          ("C-p" . company-select-previous-or-abort))
+;;   :hook (after-init . global-company-mode)
+;;   :config
+;;   (setq company-echo-delay 0.0
+;;         company-idle-delay 1.0
+;;         company-minimum-prefix-length 3
+;;         company-require-match 'never
+;;         company-selection-wrap-around t
+;;         company-show-numbers t
+;;         company-tooltip-align-annotations t
+;;         company-tooltip-flip-when-above nil
+;;         company-transformers '(company-sort-by-backend-importance
+;;                                company-sort-prefer-same-case-prefix)
+;;         )
+;; ;;   (setq company-dabbrev-downcase nil
+;; ;;         company-dabbrev-ignore-case zt
+;; ;;         company-dabbrev-other-buffers t)
+;; ;;   (setq company-dabbrev-code-everywhere t)
+;;   ;; (company-tng-configure-default) ; use TAB to select completions
+;;   )
 
 ;; (use-package crux
 ;;   :ensure t
@@ -473,34 +482,34 @@
 ;;   (global-set-key [remap kill-ring-save] 'easy-kill)
 ;;   (global-set-key [remap mark-sexp] 'easy-mark))
 
-(use-package evil
-  :ensure t
-  :init
-  (setq evil-cross-lines t              ; let move ops move between lines
-        evil-default-state 'normal
-        evil-disable-insert-state-bindings t ; std Emacs bindings for editing
-        evil-move-beyond-eol t               ; let cursor sit on ending NL
-        evil-move-cursor-back nil            ; don't back cursor up like Vim
-        evil-respect-visual-line-mode t      ; adapt to Emacs settings
-        evil-want-C-d-scroll nil
-        evil-want-C-i-jump nil
-        evil-want-C-u-delete nil
-        evil-want-C-u-scroll nil
-        evil-want-C-w-delete nil
-        evil-want-C-w-in-emacs-state nil
-        evil-want-fine-undo t
-        evil-want-keybinding nil        ; required for evil-collection
-        evil-want-Y-yank-to-eol t)
-  :diminish undo-tree-mode
-  :config
-  (evil-mode 0))
+;; (use-package evil
+;;   :ensure t
+;;   :init
+;;   (setq evil-cross-lines t              ; let move ops move between lines
+;;         evil-default-state 'normal
+;;         evil-disable-insert-state-bindings t ; std Emacs bindings for editing
+;;         evil-move-beyond-eol t               ; let cursor sit on ending NL
+;;         evil-move-cursor-back nil            ; don't back cursor up like Vim
+;;         evil-respect-visual-line-mode t      ; adapt to Emacs settings
+;;         evil-want-C-d-scroll nil
+;;         evil-want-C-i-jump nil
+;;         evil-want-C-u-delete nil
+;;         evil-want-C-u-scroll nil
+;;         evil-want-C-w-delete nil
+;;         evil-want-C-w-in-emacs-state nil
+;;         evil-want-fine-undo t
+;;         evil-want-keybinding nil        ; required for evil-collection
+;;         evil-want-Y-yank-to-eol t)
+;;   :diminish undo-tree-mode
+;;   :config
+;;   (evil-mode 0))
 
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :config
-  (evil-collection-init)
-  )
+;; (use-package evil-collection
+;;   :ensure t
+;;   :after evil
+;;   :config
+;;   (evil-collection-init)
+;;   )
 
 (use-package exec-path-from-shell
   :ensure t
@@ -512,24 +521,24 @@
   :ensure t
   :bind (("C-=" . 'er/expand-region)))
 
-(use-package flycheck
-  :ensure t
-  :disabled
-  :hook ((after-init . global-flycheck-mode) ; (prog-mode . flycheck-mode)
-         (emacs-lisp-mode . (lambda ()
-                             (let ((file-name (buffer-file-name)))
-                               (when (and file-name (string-match-p "/init\\.el\\'" file-name))
-                                 (setq-local flycheck-checkers '(emacs-lisp)))))))
-  :config
-;;  (setq flycheck-mode-line-prefix "✔")
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  )
+;; (use-package flycheck
+;;   :ensure t
+;;   :disabled
+;;   :hook ((after-init . global-flycheck-mode) ; (prog-mode . flycheck-mode)
+;;          (emacs-lisp-mode . (lambda ()
+;;                              (let ((file-name (buffer-file-name)))
+;;                                (when (and file-name (string-match-p "/init\\.el\\'" file-name))
+;;                                  (setq-local flycheck-checkers '(emacs-lisp)))))))
+;;   :config
+;; ;;  (setq flycheck-mode-line-prefix "✔")
+;;   (add-hook 'after-init-hook #'global-flycheck-mode)
+;;   )
 
-(use-package hl-todo
-  :ensure t
-  :config
-  (setq hl-todo-highlight-punctuation ":")
-  (global-hl-todo-mode))
+;; (use-package hl-todo
+;;   :ensure t
+;;   :config
+;;   (setq hl-todo-highlight-punctuation ":")
+;;   (global-hl-todo-mode))
 
 (use-package ido                ; Navigation and minibuffer completion
   :ensure t
@@ -596,28 +605,28 @@
 ;;   (global-set-key (kbd "C-a") 'mwim-beginning)
 ;;   (global-set-key (kbd "C-e") 'mwim-end))
 
-(use-package projectile
-  :ensure t
-  ;;  :diminish projectile-mode
-  :init
-  ;; (setq projectile-completion-system 'ivy)
-  :bind (:map projectile-mode-map
-              ("C-c p" . 'projectile-command-map)
-              ("s-p" . 'projectile-command-map))
-  :config
-  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  ;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  ;; (setq projectile-mode-line '(:eval (format " [%s] " (projectile-project-name)))
-  ;;       projectile-require-project-root nil) ; allow use of projectile "anywhere"
-  (projectile-mode +1))
+;; (use-package projectile
+;;   :ensure t
+;;   ;;  :diminish projectile-mode
+;;   :init
+;;   ;; (setq projectile-completion-system 'ivy)
+;;   :bind (:map projectile-mode-map
+;;               ("C-c p" . 'projectile-command-map)
+;;               ("s-p" . 'projectile-command-map))
+;;   :config
+;;   ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;;   ;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+;;   ;; (setq projectile-mode-line '(:eval (format " [%s] " (projectile-project-name)))
+;;   ;;       projectile-require-project-root nil) ; allow use of projectile "anywhere"
+;;   (projectile-mode +1))
 
-(use-package rainbow-mode
-  :ensure t
-  :pin gnu
-  :defer t
-  :diminish rainbow-mode
-  :init
-  (add-hook 'prog-mode-hook #'rainbow-mode))
+;; (use-package rainbow-mode
+;;   :ensure t
+;;   :pin gnu
+;;   :defer t
+;;   :diminish rainbow-mode
+;;   :init
+;;   (add-hook 'prog-mode-hook #'rainbow-mode))
 
 ;; (use-package smartparens
 ;;   :ensure t
@@ -782,25 +791,25 @@
   ;; (global-set-key "\M-X" #'smex-major-mode-commands)
   )
 
-(use-package super-save
-  :ensure t
-  :diminish ""
-  :config
-  ;; add integration with ace-window
-  (add-to-list 'super-save-triggers 'ace-window)
-  (super-save-mode +1))
+;; (use-package super-save
+;;   :ensure t
+;;   :diminish ""
+;;   :config
+;;   ;; add integration with ace-window
+;;   (add-to-list 'super-save-triggers 'ace-window)
+;;   (super-save-mode +1))
 
-(use-package undo-tree
-  :ensure t
-  :pin gnu
-  :config
-  ;; automatically save the undo-tree history
-  (setq undo-tree-history-directory-alist
-        `((".*" . ,temporary-file-directory)))
-  (setq undo-tree-auto-save-history t)
-  ;;(global-undo-tree-mode)
-  ;;:diminish
-  )
+;; (use-package undo-tree
+;;   :ensure t
+;;   :pin gnu
+;;   :config
+;;   ;; automatically save the undo-tree history
+;;   (setq undo-tree-history-directory-alist
+;;         `((".*" . ,temporary-file-directory)))
+;;   (setq undo-tree-auto-save-history t)
+;;   ;;(global-undo-tree-mode)
+;;   ;;:diminish
+;;   )
 
 (use-package which-key
   :ensure t
@@ -819,7 +828,7 @@
         whitespace-line-column 79)        ; highlight long lines
   )
 
-(dolist (hook '(text-mode-hook prog-mode-hook))
+(dolist (hook '(prog-mode-hook))
   (add-hook hook #'whitespace-mode))
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -834,42 +843,42 @@
 ;;   (whole-line-or-region-mode 1))
 
 
-(use-package yasnippet-snippets
-  :ensure t)
+;; (use-package yasnippet-snippets
+;;   :ensure t)
 
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :hook ((text-mode prog-mode restclient-mode org-mode) . yas-minor-mode-on)
-  :config
-  ;; (setq-default yas-prompt-functions '(yas-completing-prompt))
-  (setq yas-wrap-around-region t)
+;; (use-package yasnippet
+;;   :ensure t
+;;   :diminish yas-minor-mode
+;;   :hook ((text-mode prog-mode restclient-mode org-mode) . yas-minor-mode-on)
+;;   :config
+;;   ;; (setq-default yas-prompt-functions '(yas-completing-prompt))
+;;   (setq yas-wrap-around-region t)
 
-  ;; Jump to end of snippet definition
-  (define-key yas-keymap (kbd "C-j") 'yas-exit-all-snippets)
+;;   ;; Jump to end of snippet definition
+;;   (define-key yas-keymap (kbd "C-j") 'yas-exit-all-snippets)
 
-  ;; Inter-field navigation
-  (defun yas/goto-end-of-active-field ()
-    (interactive)
-    (let* ((snippet (car (yas-active-snippets)))
-           (position (yas--field-end (yas--snippet-active-field snippet))))
-      (if (= (point) position)
-          (move-end-of-line 1)
-        (goto-char position))))
+;;   ;; Inter-field navigation
+;;   (defun yas/goto-end-of-active-field ()
+;;     (interactive)
+;;     (let* ((snippet (car (yas-active-snippets)))
+;;            (position (yas--field-end (yas--snippet-active-field snippet))))
+;;       (if (= (point) position)
+;;           (move-end-of-line 1)
+;;         (goto-char position))))
 
-  (defun yas/goto-start-of-active-field ()
-    (interactive)
-    (let* ((snippet (car (yas-active-snippets)))
-           (position (yas--field-start (yas--snippet-active-field snippet))))
-      (if (= (point) position)
-          (move-beginning-of-line 1)
-        (goto-char position))))
+;;   (defun yas/goto-start-of-active-field ()
+;;     (interactive)
+;;     (let* ((snippet (car (yas-active-snippets)))
+;;            (position (yas--field-start (yas--snippet-active-field snippet))))
+;;       (if (= (point) position)
+;;           (move-beginning-of-line 1)
+;;         (goto-char position))))
 
-  (define-key yas-keymap (kbd "C-e") 'yas/goto-end-of-active-field)
-  (define-key yas-keymap (kbd "C-a") 'yas/goto-start-of-active-field)
+;;   (define-key yas-keymap (kbd "C-e") 'yas/goto-end-of-active-field)
+;;   (define-key yas-keymap (kbd "C-a") 'yas/goto-start-of-active-field)
 
-  (yas-reload-all)
-  )
+;;   (yas-reload-all)
+;;   )
 
 ;;----------------------------------------------------------------------------
 ;; Hydras
@@ -877,26 +886,27 @@
 
 (when (package-installed-p 'hydra)
 
-  (defhydra my:hydra-window-management (:color red :columns nil)
-    "Window Management"
+  ;; (defhydra my:hydra-window-management (:color red :columns nil)
+  ;;   "Window Management"
 
-    ("d" ace-delete-window "delete window")
-    ("o" ace-delete-other-windows "delete other windows" :exit t)
-    ("s" ace-swap-window "swap window")
-    ("j" ace-select-window "jump to window")
-    ("b" ido-switch-buffer "switch buffer in current window")
-    ("^" enlarge-window "enlarge vertically")
-    ("-" shrink-window-if-larger-than-buffer "shrink to fit buffer")
-    ("+" balance-windows "balance-windows")
-    ("}" enlarge-window-horizontally "enlarge horizontally")
-    ("{" shrink-window-horizontally "shrink horizontally")
-    ("2" (lambda () (interactive) (split-window-below) (windmove-down)) "split down")
-    ("3" (lambda () (interactive) (split-window-right) (windmove-right)) "split right")
-    ("r" (progn (winner-redo) (setq this-command 'winner-redo)) "redo")
-    ("u" (progn (winner-undo) (setq this-command 'winner-undo)) "undo")
-    ("q" nil "quit"))
+  ;;   ("d" ace-delete-window "delete window")
+  ;;   ("o" ace-delete-other-windows "delete other windows" :exit t)
+  ;;   ("s" ace-swap-window "swap window")
+  ;;   ("j" ace-select-window "jump to window")
+  ;;   ("b" ido-switch-buffer "switch buffer in current window")
+  ;;   ("^" enlarge-window "enlarge vertically")
+  ;;   ("-" shrink-window-if-larger-than-buffer "shrink to fit buffer")
+  ;;   ("+" balance-windows "balance-windows")
+  ;;   ("}" enlarge-window-horizontally "enlarge horizontally")
+  ;;   ("{" shrink-window-horizontally "shrink horizontally")
+  ;;   ("2" (lambda () (interactive) (split-window-below) (windmove-down)) "split down")
+  ;;   ("3" (lambda () (interactive) (split-window-right) (windmove-right)) "split right")
+  ;;   ("r" (progn (winner-redo) (setq this-command 'winner-redo)) "redo")
+  ;;   ("u" (progn (winner-undo) (setq this-command 'winner-undo)) "undo")
+  ;;   ("q" nil "quit"))
 
-  (global-set-key (kbd "C-x w") 'my:hydra-window-management/body))
+  ;; (global-set-key (kbd "C-x w") 'my:hydra-window-management/body)
+  )
 
 ;;----------------------------------------------------------------------------
 ;; Dired
@@ -951,6 +961,8 @@
 (eval-after-load "shell"
   '(add-to-list 'explicit-bash-args "-l" t))
 
+(add-hook 'shell-mode-hook 'pcomplete-shell-setup)
+
 ;;----------------------------------------------------------------------------
 ; Tramp
 ;;----------------------------------------------------------------------------
@@ -999,11 +1011,11 @@
 ;; REST client
 ;;----------------------------------------------------------------------------
 
-(use-package restclient
-  :ensure t
-  :mode (("\\.http\\'" . restclient-mode))
-  :config
-  )
+;; (use-package restclient
+;;   :ensure t
+;;   :mode (("\\.http\\'" . restclient-mode))
+;;   :config
+;;   )
 
 ;;----------------------------------------------------------------------------
 ;; Common programming setup
@@ -1051,24 +1063,24 @@
 ;; Emacs LISP
 ;;----------------------------------------------------------------------------
 
-(use-package lisp-mode
-  :config
-  (defun my:visit-ielm ()
-    "Switch to default `ielm' buffer. Start `ielm' if it's not already running."
-    (interactive)
-    (crux-start-or-switch-to 'ielm "*ielm*"))
+;; (use-package lisp-mode
+;;   :config
+;;   (defun my:visit-ielm ()
+;;     "Switch to default `ielm' buffer. Start `ielm' if it's not already running."
+;;     (interactive)
+;;     (crux-start-or-switch-to 'ielm "*ielm*"))
 
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'my:visit-ielm)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
-  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
+;;   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+;;   (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'my:visit-ielm)
+;;   (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
+;;   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
+;;   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+;;   (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
 
-(use-package ielm
-  :config
-  (add-hook 'ielm-mode-hook #'eldoc-mode)
-  )
+;; (use-package ielm
+;;   :config
+;;   (add-hook 'ielm-mode-hook #'eldoc-mode)
+;;   )
 
 ;; (use-package elisp-slime-nav
 ;;   :ensure t
@@ -1101,62 +1113,62 @@
 ;; HTML/CSS editing
 ;;----------------------------------------------------------------------------
 
-(use-package web-mode
-  :ensure t
-  :mode ("\\.djhtml\\'"
-         "\\.ejs\\'"
-         "\\.erb\\'"
-         "\\.html?\\'"
-         "\\.j2\\'"
-         "\\.jinja\\'"
-         "\\.mustache\\'"
-         "\\.php\\'"
-         "\\.xhtml?\\'")
-  :init
-  ;; fix paren matching web-mode conflict for jinja-like templates
-  ;; (add-hook 'web-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-local electric-pair-inhibit-predicate
-  ;;                         (lambda (c)
-  ;;                           (if (char-equal c ?{) t (electric-pair-default-inhibit c))))))
-  :config
-  (setq css-indent-offset 2
-        web-mode-ac-sources-alist '(("css" . (ac-source-css-property))
-                                    ("html" . (ac-source-words-in-buffer ac-source-abbrev)))
-        web-mode-block-padding 2
-        web-mode-code-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-enable-auto-closing t
-        web-mode-enable-auto-expanding t
-        web-mode-enable-auto-indentation nil
-        web-mode-enable-auto-pairing nil ; use smartparens instead
-        web-mode-enable-auto-quoting t
-        web-mode-enable-comment-keywords t
-        web-mode-enable-css-colorization t
-        web-mode-enable-current-column-hightlight t
-        web-mode-enable-current-element-highlight t
-        web-mode-engines-alist '(("django" . "\\.html\\'"))
-        web-mode-markup-indent-offset 2
-        web-mode-attr-indent-offset 2)
-  ;; (defun sp-web-mode-is-code-context (id action context)
-  ;;   (and (eq action 'insert)
-  ;;        (not (or (get-text-property (point) 'part-side)
-  ;;                 (get-text-property (point) 'block-side)))))
+;; (use-package web-mode
+;;   :ensure t
+;;   :mode ("\\.djhtml\\'"
+;;          "\\.ejs\\'"
+;;          "\\.erb\\'"
+;;          "\\.html?\\'"
+;;          "\\.j2\\'"
+;;          "\\.jinja\\'"
+;;          "\\.mustache\\'"
+;;          "\\.php\\'"
+;;          "\\.xhtml?\\'")
+;;   :init
+;;   ;; fix paren matching web-mode conflict for jinja-like templates
+;;   ;; (add-hook 'web-mode-hook
+;;   ;;           (lambda ()
+;;   ;;             (setq-local electric-pair-inhibit-predicate
+;;   ;;                         (lambda (c)
+;;   ;;                           (if (char-equal c ?{) t (electric-pair-default-inhibit c))))))
+;;   :config
+;;   (setq css-indent-offset 2
+;;         web-mode-ac-sources-alist '(("css" . (ac-source-css-property))
+;;                                     ("html" . (ac-source-words-in-buffer ac-source-abbrev)))
+;;         web-mode-block-padding 2
+;;         web-mode-code-indent-offset 2
+;;         web-mode-css-indent-offset 2
+;;         web-mode-enable-auto-closing t
+;;         web-mode-enable-auto-expanding t
+;;         web-mode-enable-auto-indentation nil
+;;         web-mode-enable-auto-pairing nil ; use smartparens instead
+;;         web-mode-enable-auto-quoting t
+;;         web-mode-enable-comment-keywords t
+;;         web-mode-enable-css-colorization t
+;;         web-mode-enable-current-column-hightlight t
+;;         web-mode-enable-current-element-highlight t
+;;         web-mode-engines-alist '(("django" . "\\.html\\'"))
+;;         web-mode-markup-indent-offset 2
+;;         web-mode-attr-indent-offset 2)
+;;   ;; (defun sp-web-mode-is-code-context (id action context)
+;;   ;;   (and (eq action 'insert)
+;;   ;;        (not (or (get-text-property (point) 'part-side)
+;;   ;;                 (get-text-property (point) 'block-side)))))
 
-  ;; (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
-  )
+;;   ;; (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
+;;   )
 
 ;; (use-package web-beautify
 ;;   :ensure t
 ;;   :commands (web-beautify-html-buffer)
 ;;   )
 
-(use-package css-mode
-  :ensure t
-  :mode "\\.css\\'"
-  :config
-  (setq css-indent-offset 2)
-  (electric-pair-mode 1))
+;; (use-package css-mode
+;;   :ensure t
+;;   :mode "\\.css\\'"
+;;   :config
+;;   (setq css-indent-offset 2)
+;;   (electric-pair-mode 1))
 
 ;; (use-package scss-mode
 ;;   :ensure t
@@ -1188,88 +1200,88 @@
 ;; Markdown & YAM
 ;;----------------------------------------------------------------------------
 
-(use-package markdown-mode
-  :ensure t
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :config
-  (setq markdown-fontify-code-blocks-natively t))
+;; (use-package markdown-mode
+;;   :ensure t
+;;   :commands (markdown-mode gfm-mode)
+;;   :mode (("README\\.md\\'" . gfm-mode)
+;;          ("\\.md\\'" . markdown-mode)
+;;          ("\\.markdown\\'" . markdown-mode))
+;;   :config
+;;   (setq markdown-fontify-code-blocks-natively t))
 
-(use-package yaml-mode
-  :ensure t)
+;; (use-package yaml-mode
+;;   :ensure t)
 
 ;;----------------------------------------------------------------------------
 ;; JavaScript mode configuration
 ;;----------------------------------------------------------------------------
 
-(use-package rjsx-mode
-  :ensure t
-  :mode ("\\.js\\'"
-         "\\.jsx\\'")
-  :interpreter "node"
-  :hook ((js2-mode . (lambda ()
-                       (eldoc-mode)
-                       (electric-pair-mode)
-                       (flycheck-mode)
-                       (company-mode))))
-  :config
-  (setq-default js-indent-level 4
-                js2-basic-offset 4
-                js2-bounce-indent-p t
-                js2-chain-indent t
-;;                js2-show-parse-errors nil
-;;                js2-show-strict-warnings nil
-                js2-strict-inconsistent-return-warning t
-                js2-strict-missing-semi-warning t
-                js2-strict-trailing-comma-warning nil)
-  (setq-local flycheck-disabled-checkers (cl-union flycheck-disabled-checkers
-                                                   '(javascript-jshint))) ; jshint doesn't work for JSX
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  ;; formats the buffer before saving
-  (add-hook 'before-save-hook 'tide-format-before-save)
-  (setq-default js2-global-externs
-                  '("module"
-                    "exports"
-                    "require"
-                    "process"
-                    "setTimeout"
-                    "clearTimeout"
-                    "setInterval"
-                    "clearInterval"
-                    "window"
-                    "location"
-                    "__dirname"
-                    "console"
-                    "JSON"))
-  (electric-pair-mode 1)
-  ;;; flycheck settings
-  ;;(add-hook 'flycheck-mode-hook #'cs/use-linter-from-package-json)
-  )
+;; (use-package rjsx-mode
+;;   :ensure t
+;;   :mode ("\\.js\\'"
+;;          "\\.jsx\\'")
+;;   :interpreter "node"
+;;   :hook ((js2-mode . (lambda ()
+;;                        (eldoc-mode)
+;;                        (electric-pair-mode)
+;;                        (flycheck-mode)
+;;                        (company-mode))))
+;;   :config
+;;   (setq-default js-indent-level 4
+;;                 js2-basic-offset 4
+;;                 js2-bounce-indent-p t
+;;                 js2-chain-indent t
+;; ;;                js2-show-parse-errors nil
+;; ;;                js2-show-strict-warnings nil
+;;                 js2-strict-inconsistent-return-warning t
+;;                 js2-strict-missing-semi-warning t
+;;                 js2-strict-trailing-comma-warning nil)
+;;   (setq-local flycheck-disabled-checkers (cl-union flycheck-disabled-checkers
+;;                                                    '(javascript-jshint))) ; jshint doesn't work for JSX
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   ;; formats the buffer before saving
+;;   (add-hook 'before-save-hook 'tide-format-before-save)
+;;   (setq-default js2-global-externs
+;;                   '("module"
+;;                     "exports"
+;;                     "require"
+;;                     "process"
+;;                     "setTimeout"
+;;                     "clearTimeout"
+;;                     "setInterval"
+;;                     "clearInterval"
+;;                     "window"
+;;                     "location"
+;;                     "__dirname"
+;;                     "console"
+;;                     "JSON"))
+;;   (electric-pair-mode 1)
+;;   ;;; flycheck settings
+;;   ;;(add-hook 'flycheck-mode-hook #'cs/use-linter-from-package-json)
+;;   )
 
 ;; javascript eval and repl
-(use-package indium
-  :ensure t
-  :defer t
-  :diminish indium-interaction-mode
-  :hook (((js2-mode rjsx-mode) . indium-interaction-mode))
-  :config
-  )
+;; (use-package indium
+;;   :ensure t
+;;   :defer t
+;;   :diminish indium-interaction-mode
+;;   :hook (((js2-mode rjsx-mode) . indium-interaction-mode))
+;;   :config
+;;   )
 
-(use-package typescript-mode
-  :ensure t)
+;; (use-package typescript-mode
+;;   :ensure t)
 
 ;; typescript "IDE"
 
-(use-package tide
-  :ensure t
-  :defer t
-  :diminish tide-mode
-  :hook (((typescript-mode) . tide-setup))
-  :config
-  (setq tide-format-options '(:indentSize 2 :tabSize 2))
-  )
+;; (use-package tide
+;;   :ensure t
+;;   :defer t
+;;   :diminish tide-mode
+;;   :hook (((typescript-mode) . tide-setup))
+;;   :config
+;;   (setq tide-format-options '(:indentSize 2 :tabSize 2))
+;;   )
 
 ;; (use-package js2-mode
 ;;   :ensure t
@@ -1308,13 +1320,13 @@
 ;;                      '(javascript-jshint)))
 ;;   )
 
-(use-package json-mode
-  :ensure t
-  :defer t
-  :hook (json-mode . (lambda ()
-                       (setq js-indent-level 2)))
-  :config
-  )
+;; (use-package json-mode
+;;   :ensure t
+;;   :defer t
+;;   :hook (json-mode . (lambda ()
+;;                        (setq js-indent-level 2)))
+;;   :config
+;;   )
 
 ;;----------------------------------------------------------------------------
 ;; Python mode configuration
@@ -1377,11 +1389,11 @@
             ))
     )
 
-(use-package pyenv-mode
-  :disabled
-  :ensure t
-  :hook python-mode
-  )
+;; (use-package pyenv-mode
+;;   :disabled
+;;   :ensure t
+;;   :hook python-mode
+;;   )
 
 ;; (use-package company-jedi
 ;;   :ensure t
@@ -1452,7 +1464,7 @@
         (if (and result (car result))
             (apply 'server-switch-buffer result)
           (shell-command "open -a Terminal")))
-    (kill-buffer (current-buffer))))
+    (kill-buffer-and-window)))
 
 (global-set-key (kbd "C-x k") 'my:kill-current-buffer)
 
@@ -1464,8 +1476,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   (quote
-    (zenburn-theme yasnippet-snippets yaml-mode which-key web-mode use-package tide super-save smex rjsx-mode restclient rainbow-mode projectile markdown-mode magit ido-vertical-mode hydra flx-ido expand-region exec-path-from-shell evil-collection diminish ace-window))))
+   '(zenburn-theme which-key use-package smex magit ido-vertical-mode hydra flx-ido exec-path-from-shell diminish)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
